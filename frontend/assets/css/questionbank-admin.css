@@ -1,0 +1,51 @@
+:root {
+  --qb-primary: #6b4c9a;
+  --qb-accent: #32c9c4;
+  --qb-bg: #f7f4ff;
+}
+
+body {
+  background: var(--qb-bg);
+}
+
+.admin-hero {
+  padding: 50px 0 30px;
+  background: linear-gradient(135deg, #ede4ff, #fff);
+  text-align: center;
+}
+
+.quick-start {
+  border-left: 4px solid var(--qb-primary);
+  background: #fff;
+}
+
+/* admin-card styled in module-ui.css */
+
+.nav-pills .nav-link.active {
+  background: var(--qb-primary);
+}
+
+.json-preview {
+  background: #1e1e1e;
+  color: #d4f4c4;
+  border-radius: 10px;
+  padding: 14px;
+  max-height: 320px;
+  overflow: auto;
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+
+.status-bar {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+}
+
+.status-bar.error {
+  color: #c0392b;
+}
+
+.status-bar.ok {
+  color: #1e8449;
+}

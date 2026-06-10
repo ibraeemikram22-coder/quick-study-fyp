@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Grammar Check - Quick Study Builder</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../../assets/css/module-ui.css">
+<link rel="stylesheet" href="../../assets/css/grammar.css">
+<link rel="stylesheet" href="../../assets/css/layout.css">
+</head>
+
+<body class="module-tool-page">
+
+<div id="header"></div>
+
+<!-- HERO -->
+<section class="page-header">
+  <div class="container">
+    <h1>AI Grammar <span class="accent">Check</span></h1>
+    <p class="lead">Fix grammar, spelling & clarity instantly</p>
+  </div>
+</section>
+
+<!-- TOOL -->
+<section class="py-5">
+<div class="container">
+
+<div class="row g-4 align-items-stretch">
+
+<!-- LEFT -->
+<div class="col-lg-6">
+<div class="grammar-box">
+
+<h4 class="fw-bold mb-3">Enter Your Text</h4>
+
+<textarea id="grammar-input" placeholder="Paste or type text here..."></textarea>
+
+<hr>
+
+<div class="form-check mb-3">
+  <input class="form-check-input" type="checkbox" id="convert-notes">
+  <label class="form-check-label">Convert to Notes</label>
+</div>
+
+<div class="text-end">
+<button class="action-btn" id="check-btn">
+<i class="fas fa-spell-check me-2"></i>Check Grammar
+</button>
+</div>
+
+</div>
+</div>
+
+<!-- RIGHT -->
+<div class="col-lg-6">
+<div class="grammar-box position-relative">
+
+<h4 class="fw-bold mb-2">Corrected Output</h4>
+
+<div id="grammar-percentage">Grammar Issues: 0%</div>
+
+<button id="copy-btn">Copy</button>
+<button id="highlight-btn">Show Mistakes</button>
+
+<div class="result-box" id="output-box">
+Your corrected text will appear here...
+</div>
+
+</div>
+</div>
+
+</div>
+
+<!-- EXPLANATION BOX -->
+<div id="explanation-box">
+    
+</div>
+
+</div>
+
+    <div class="admin-card mt-4">
+      <h5 class="mb-2"><i class="fas fa-clock-rotate-left me-1"></i> Recent history (MySQL)</h5>
+      <div id="moduleHistoryList"></div>
+    </div>
+</section>
+
+<section class="module-guide-section">
+  <div class="container">
+    <div class="module-guide">
+      <h5><i class="fas fa-circle-info me-2"></i>How to use Grammar Check</h5>
+      <p class="guide-lead">Fix spelling, grammar, and clarity in your assignments or notes.</p>
+      <div class="module-guide-steps guide-cols-2">
+        <div class="module-guide-step">
+          <span class="step-num">1</span>
+          <div>
+            <h6>Paste or type your text</h6>
+            <p>Enter your paragraph, essay, or notes in the left panel. Works best with complete sentences.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">2</span>
+          <div>
+            <h6>Optional: Convert to Notes</h6>
+            <p>Tick <strong>Convert to Notes</strong> if you want cleaned-up bullet-style study notes instead of a straight grammar fix.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">3</span>
+          <div>
+            <h6>Run the check</h6>
+            <p>Click <strong>Check Grammar</strong>. Corrected text appears on the right with an issue percentage.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">4</span>
+          <div>
+            <h6>Review mistakes</h6>
+            <p>Use <strong>Show Mistakes</strong> to highlight what changed, then <strong>Copy</strong> the final text to your document.</p>
+          </div>
+        </div>
+      </div>
+      <div class="module-guide-tip">
+        <i class="fas fa-lightbulb me-2"></i>
+        <strong>Tip:</strong> For long lecture transcripts, run Grammar Check after using the Summarizer or Transcript tools.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+
+<script src="../../assets/js/header-footer.js"></script>
+<script src="../../assets/js/api-config.js"></script>
+<script src="../../assets/js/module-history.js"></script>
+<script src="../../assets/js/grammar.js"></script>
+
+</body>
+</html>

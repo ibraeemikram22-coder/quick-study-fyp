@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Study AI Chatbot</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --primary:#733697e8;
+    --secondary:#b08ce2;
+    --bg:#f4f0ff;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Poppins;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+}
+
+/* CHAT BOX */
+.chat-container{
+    width:420px;
+    height:600px;
+    background:rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-radius:18px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+}
+
+/* HEADER */
+.chat-header{
+    background:linear-gradient(90deg,var(--secondary),var(--primary));
+    color:white;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-weight:600;
+}
+
+/* BODY */
+.chat-body{
+    flex:1;
+    padding:12px;
+    overflow-y:auto;
+    background:var(--bg);
+}
+
+.msg{
+    padding:10px 12px;
+    margin:8px 0;
+    border-radius:12px;
+    max-width:75%;
+    font-size:14px;
+    animation:fade 0.3s ease-in;
+}
+
+@keyframes fade{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+.user{
+    background:var(--secondary);
+    color:white;
+    margin-left:auto;
+    border-bottom-right-radius:0;
+}
+
+.bot{
+    background:white;
+    border:1px solid #eee;
+    margin-right:auto;
+    border-bottom-left-radius:0;
+}
+
+/* INPUT */
+.chat-input{
+    display:flex;
+    padding:10px;
+    gap:8px;
+    background:white;
+    border-top:1px solid #eee;
+}
+
+.chat-input input{
+    flex:1;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    outline:none;
+}
+
+.chat-input button{
+    background:linear-gradient(90deg,var(--secondary),var(--primary));
+    color:white;
+    border:none;
+    padding:12px 16px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+/* MOBILE RESPONSIVE */
+@media(max-width:600px){
+
+    body{
+        padding:10px;
+        align-items:flex-start;
+    }
+
+    .chat-container{
+        width:100%;
+        height:90vh;
+        border-radius:15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="chat-container">
+
+    <!-- HEADER -->
+    <div class="chat-header">
+        <span>Quick Study AI Assistant 🤖</span>
+    </div>
+
+    <!-- CHAT BODY -->
+    <div class="chat-body" id="chatBody">
+        <div class="msg bot">Hi 👋 I'm your Study Assistant. Ask me anything!</div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="chat-input">
+        <input type="text" id="msg" placeholder="Type your message...">
+        <button onclick="sendMsg()">Send</button>
+    </div>
+
+</div>
+
+<script>
+function sendMsg(){
+
+    let input = document.getElementById("msg");
+    let text = input.value.trim();
+    if(text === "") return;
+
+    let chatBody = document.getElementById("chatBody");
+
+    // USER MESSAGE
+    chatBody.innerHTML += `<div class="msg user">${text}</div>`;
+
+    // BOT REPLY
+    let reply = getReply(text);
+
+    setTimeout(()=>{
+        chatBody.innerHTML += `<div class="msg bot">${reply}</div>`;
+        chatBody.scrollTop = chatBody.scrollHeight;
+    },500);
+
+    input.value = "";
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+/* SIMPLE BOT LOGIC */
+function getReply(msg){
+
+    msg = msg.toLowerCase();
+
+    if(msg.includes("hello") || msg.includes("hi")){
+        return "Hello 👋 How can I help you?";
+    }
+    if(msg.includes("quiz")){
+        return "Go to Quiz module in Features 📚";
+    }
+    if(msg.includes("notes")){
+        return "Check Summarized Notes tool ✍️";
+    }
+    if(msg.includes("grammar")){
+        return "Use Grammar Check tool ✨";
+    }
+
+    return "I'm still learning 🤖 but improving daily!";
+}
+</script>
+
+</body>
+</html>

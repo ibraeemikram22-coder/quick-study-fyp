@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Teacher Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../../assets/css/home.css">
+<link rel="stylesheet" href="../../assets/css/module-ui.css">
+<link rel="stylesheet" href="../../assets/css/teacher.css">
+<link rel="stylesheet" href="../../assets/css/layout.css">
+</head>
+
+<body>
+
+<div id="header"></div>
+
+<section class="page-header">
+  <div class="container">
+    <h1>Teacher <span>Dashboard</span></h1>
+    <p class="lead">Database Driven Paper Generator</p>
+  </div>
+</section>
+
+<section class="py-5">
+<div class="container">
+
+<!-- CLASS -->
+<div class="dashboard-box">
+<h5>Class</h5>
+<select id="class" class="form-control">
+<option value="">Select Class</option>
+</select>
+</div>
+
+<!-- BOARD -->
+<div class="dashboard-box">
+<h5>Board</h5>
+<select id="board" class="form-control">
+<option value="">Select Board</option>
+</select>
+</div>
+
+<!-- EXAM TYPE -->
+<div class="dashboard-box">
+<h5>Exam Type</h5>
+<select id="exam" class="form-control">
+<option value="">Select Exam</option>
+</select>
+</div>
+
+<!-- SUBJECT -->
+<div class="dashboard-box">
+<h5>Subject</h5>
+<select id="subject" class="form-control">
+<option value="">Select Subject</option>
+</select>
+</div>
+
+<!-- BOOKS (DYNAMIC) -->
+<div class="dashboard-box">
+<h5>Books</h5>
+<div id="bookContainer">Select subject first</div>
+</div>
+
+<!-- CHAPTERS (DYNAMIC) -->
+<div class="dashboard-box">
+<h5>Chapters / Syllabus</h5>
+<button class="small-btn" onclick="selectAll()">Select All</button>
+<div id="chapterContainer"></div>
+</div>
+
+<!-- PATTERN -->
+<div class="dashboard-box">
+<h5>Paper Pattern</h5>
+<div id="patternBox" class="output-box"></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="dashboard-box">
+<h5>Settings</h5>
+
+<input id="marks" class="form-control mb-2" value="100">
+<input id="time" class="form-control mb-2" value="3 Hours">
+
+<select id="difficulty" class="form-control">
+<option>Easy</option>
+<option>Medium</option>
+<option>Hard</option>
+<option>Mixed</option>
+</select>
+
+</div>
+
+<!-- GENERATE -->
+<div class="text-center">
+<button class="action-btn" onclick="generatePaper()">Generate Paper</button>
+</div>
+
+<!-- OUTPUT -->
+<div class="dashboard-box mt-4" id="outputBox" style="display:none;">
+<h5>Generated Paper</h5>
+<div class="output-box" id="output"></div>
+</div>
+
+</div>
+</section>
+
+<section class="module-guide-section">
+  <div class="container">
+    <div class="module-guide">
+      <h5><i class="fas fa-circle-info me-2"></i>How to use Teacher Paper Generator</h5>
+      <p class="guide-lead">Build board-style exam papers from questions stored in the database.</p>
+      <div class="module-guide-steps guide-cols-2">
+        <div class="module-guide-step">
+          <span class="step-num">1</span>
+          <div>
+            <h6>Select filters</h6>
+            <p>Choose class, board, exam type, and subject. These must match what was set up in the Admin panel.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">2</span>
+          <div>
+            <h6>Pick book &amp; chapters</h6>
+            <p>Click a book, then tick the chapters you want on the paper. Use <strong>Select All</strong> for a full-book test.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">3</span>
+          <div>
+            <h6>Check the pattern</h6>
+            <p>The paper pattern (MCQ / short / long counts, marks, time) loads automatically for your board and exam type.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">4</span>
+          <div>
+            <h6>Generate paper</h6>
+            <p>Click <strong>Generate Paper</strong>. Questions are picked randomly from the database. If you see “not enough questions,” add more in Admin.</p>
+          </div>
+        </div>
+      </div>
+      <div class="module-guide-tip">
+        <i class="fas fa-lightbulb me-2"></i>
+        <strong>Tip:</strong> Chapters and questions are added in the Question Bank Admin panel. Student Generate Paper is separate — it builds papers from uploaded notes, not the database.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="../../assets/js/header-footer.js"></script>
+<script src="../../assets/js/api-config.js"></script>
+<script src="../../assets/js/questionbank-teacher.js"></script>
+
+</body>
+</html>

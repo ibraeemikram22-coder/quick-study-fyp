@@ -1,0 +1,266 @@
+
+/* ROOT COLORS (Simplified for custom styles) */
+:root{
+--primary:#ffeb3a; /* 🌟 Bright Gold/Yellow 🌟 */
+--secondary:#32c9c4; /* Teal - Retaining brightness */
+--light:#f5f5f5;
+--dark:#b081d2; /* 🌟 Bright Dark Purple 🌟 */
+--text:#1d1d1f;
+--subtext:#555;
+--white:#fff;
+--shadow:0 4px 15px rgba(119, 101, 101, 0.982);
+}
+
+/* CUSTOM STYLES (Focus on elements not easily done in BS) */
+body{
+    font-family:'Poppins',sans-serif;
+    background:var(--white);
+    color:var(--text);
+    /* HEADER FIX: Added padding to body equal to the fixed header's height to prevent content from hiding underneath */
+    padding-top: 75px; 
+}
+a{text-decoration:none;}
+
+.logo .main-logo-text{font-size:1.5em;font-weight:900;color:var(--white);} 
+.logo .sub-text{color:var(--secondary);}
+.logo .tagline{font-size:0.8em;color:#ddd;margin-top:-4px;}
+.nav-link-custom {
+    color: #eee !important;
+    font-weight: 600;
+    font-size: 1em;
+    padding-top: 10px; 
+    padding-bottom: 10px; 
+    border-bottom: 3px solid transparent;
+    transition: 0.2s;
+}
+.nav-link-custom:hover {
+    color: var(--primary) !important;
+    border-bottom-color: var(--primary);
+}
+
+/* CTA Button - Login/Signup Button */
+.btn-cta{
+    background:var(--primary) !important;
+    border-color:var(--primary) !important;
+    color:var(--dark)!important; 
+    font-weight:900; /* ⭐ INCREASED BOLDNESS HERE ⭐ */
+}
+.btn-cta:hover{background:var(--secondary) !important; border-color:var(--secondary) !important; color:var(--white) !important;}
+
+/* ⭐ NEW STYLE for Hero Section Button (when using btn-dark class) ⭐ */
+.hero-text .btn-dark {
+    background: var(--dark) !important;
+    border-color: var(--dark) !important;
+    color: var(--white) !important;
+    font-weight: 700;
+    transition: 0.3s;
+}
+.hero-text .btn-dark:hover {
+    background: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+    color: var(--white) !important;
+}
+
+
+/* HERO SECTION */
+.hero-section{
+padding-top:40px; 
+padding-bottom:80px;
+background:var(--light);
+}
+/* This is for the mobile view: hide animation on small screens */
+.hero-animation{height:350px; position:relative;}
+@media (max-width: 768px) {
+    .hero-animation {
+        display: none !important;
+    }
+    .hero-text {
+        text-align: center !important;
+    }
+}
+.floating-icon{
+    position:absolute;font-size:2.8em;
+    animation:float 6s infinite ease-in-out;
+}
+@keyframes float{
+    0%{transform:translate(0,0);}
+    50%{transform:translate(10px,-15px);}
+    100%{transform:translate(0,0);}
+}
+
+.hero-text h1{font-size:3.4em;margin-bottom:10px;font-weight:900;} 
+.hero-text p{font-size:1.1em;color:var(--subtext);margin-bottom:25px;}
+
+/* SECTION TITLE */
+.section-title{text-align:center;font-size:2.7em;margin-bottom:55px;font-weight:900;} 
+.section-title span{
+    background:linear-gradient(45deg,var(--primary),var(--secondary));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+/* WHY US - BOXES */
+#why-us{
+    padding:90px 0;
+    background: linear-gradient(135deg, #fff, #f7f0ff);
+}
+.why-box{
+    padding:40px 25px;
+    border-radius:18px;
+    background:#e0bffe;
+    box-shadow:0 12px 28px rgba(0,0,0,0.08);
+    text-align:center;
+    transition:0.3s;
+    overflow:hidden;
+}
+.why-box h3{
+    font-weight: 700; 
+}
+.why-box:hover{
+    transform:translateY(-8px) scale(1.03);
+    box-shadow:0 18px 35px rgba(0,0,0,0.12);
+}
+.why-icon{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:90px;
+    height:90px;
+    margin:0 auto 15px;
+    border-radius:50%;
+    background: linear-gradient(135deg,#a758d5,#e8f3f3);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    color:white;
+    font-size:2.4em;
+}
+/* FIX: Equal height for all WHY boxes */
+#why-us .row {
+    display: flex;
+    align-items: stretch;
+}
+
+#why-us .col-lg-4 {
+    display: flex;
+}
+
+.why-box {
+    height: 100%;
+    width: 100%;
+}
+/* FEATURES - CARDS */
+.features-section{
+    padding: 90px 0;
+    background: linear-gradient(135deg, #ffffff, #f3e8ff);
+    position: relative;
+}
+.feature-card{
+    padding:35px 25px;
+    border-radius:18px;
+    background:#e0bffe;
+    border:1px solid #eee;
+    overflow:hidden;
+    transition:0.35s;
+    box-shadow:0 0 0 rgba(0,0,0,0);
+    height: 100%; 
+}
+.feature-card h3{
+    font-weight: 700; 
+}
+.feature-card:hover{
+    transform:translateY(-10px) scale(1.02);
+    box-shadow:0 15px 35px rgba(0,0,0,0.12);
+    border-color:var(--primary);
+}
+.feature-card i{
+    font-size:2.6em;
+    margin-bottom:12px;
+    padding:15px;
+    border-radius:12px;
+    background:linear-gradient(145deg,#ffffff,#dedede);
+    box-shadow: inset 3px 3px 8px #bebebe, inset -3px -3px 8px #ffffff;
+    animation:iconPulse 3s infinite ease-in-out;
+}
+@keyframes iconPulse{
+    0% { color:var(--primary); }
+    50% { color:var(--secondary); }
+    100% { color:var(--primary); }
+}
+
+/* VISUAL SECTIONS (Why StudyAI, How it Works, etc.) */
+.visual-section { padding:80px 0; }
+.visual-section h2 {font-weight:900;} 
+.bg-light-custom { background: #f9f9f9; }
+.list-unstyled li { margin-bottom: 8px; }
+.img-grid img { 
+    width: 100%; 
+    border-radius: 12px; 
+    object-fit: cover; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+    height: 100%; 
+}
+#chatbot-box{
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 360px;
+    height: 520px;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+
+    transform: translateX(120%);
+    opacity: 0;
+    pointer-events: none;
+
+    transition: 0.4s ease;
+    z-index: 99999;
+}
+
+#chatbot-box.active{
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#chatbot-box iframe{
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* CLOSE BUTTON FIX (IMPORTANT) */
+#chatbot-close{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background: #733697;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 100000;
+    font-weight: bold;
+}
+
+/* ICON */
+#chatbot-icon{
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg,#733697e8,#b08ce2);
+    color: white;
+    border-radius: 50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 99999;
+}

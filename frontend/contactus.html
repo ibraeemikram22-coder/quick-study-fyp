@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us • Quick Study</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="./assets/css/contactus.css">
+<link rel="stylesheet" href="./assets/css/layout.css">
+
+<style>
+/* FEEDBACK BUTTON */
+/* ================= FEEDBACK BUTTON ================= */
+.feedback-btn{
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    padding: 12px 20px;
+    background: #8802bd;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+.feedback-btn:hover{
+    background:#5200cc;
+    transform: translateY(-2px);
+}
+
+/* ================= POPUP OVERLAY ================= */
+#feedbackPopup{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.6);
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+
+    padding:20px;
+    box-sizing:border-box;
+}
+
+/* ================= POPUP BOX ================= */
+.popup-box{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    width:100%;
+    max-width:350px;
+
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+
+    box-sizing:border-box;
+}
+
+/* TITLE */
+.popup-box h2{
+    margin-bottom:15px;
+}
+
+/* ================= INPUTS ================= */
+.popup-box select,
+.popup-box textarea{
+    width:100%;
+    margin-top:10px;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #ddd;
+
+    font-family: inherit;
+    font-size:14px;
+
+    box-sizing:border-box;   /* 🔥 IMPORTANT FIX */
+}
+
+.popup-box textarea{
+    resize:none;
+    height:100px;
+}
+
+/* ================= BUTTONS WRAPPER ================= */
+.popup-box button{
+    margin-top:12px;
+    padding:10px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    width:48%;
+    font-weight:600;
+}
+
+/* BUTTON ROW */
+.popup-box{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+/* BUTTON CONTAINER */
+.popup-buttons{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+}
+
+/* SUBMIT */
+.submit-btn{
+    background:#00d9ff;
+    color:white;
+}
+
+/* CLOSE */
+.close-btn{
+    background:#ffcc00;
+    color:black;
+}
+</style>
+</head>
+
+<body>
+
+<div id="header"></div>
+
+<!-- BACKGROUND -->
+<img src="./assets/images/image8.jpg" class="bg-img" alt="Background">
+
+<!-- CONTACT FORM -->
+<form class="contact-form" id="contactForm">
+    <h1>Contact Us</h1>
+    <p class="contact-email-line">Email: <span id="displayContactEmail">quickstudybuilder@gmail.com</span></p>
+
+    <div class="input-container">
+    <img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" alt="">
+    <input type="text" name="name" placeholder="Your Name" required>
+    </div>
+
+    <div class="input-container">
+    <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" alt="">
+    <input type="email" name="email" placeholder="Your Email" required>
+    </div>
+
+    <div class="input-container">
+    <img src="https://cdn-icons-png.flaticon.com/512/2462/2462719.png" alt="">
+    <textarea name="message" placeholder="Your Message" required></textarea>
+    </div>
+<br>
+    <input type="submit" value="Send Message">
+</form>
+
+<!-- FEEDBACK BUTTON -->
+<button class="feedback-btn" onclick="openFeedback()">Feedback</button>
+
+<!-- FEEDBACK POPUP -->
+<div id="feedbackPopup">
+    <div class="popup-box">
+
+        <h2>Give Feedback </h2>
+
+        <select id="rating">
+            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+            <option value="4">⭐⭐⭐⭐ Good</option>
+            <option value="3">⭐⭐⭐ Average</option>
+            <option value="2">⭐⭐ Poor</option>
+            <option value="1">⭐ Bad</option>
+        </select>
+
+        <input type="text" id="fbName" placeholder="Your name (optional)" style="width:100%;margin-top:10px;padding:12px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box;">
+        <input type="email" id="fbEmail" placeholder="Your email (optional)" style="width:100%;margin-top:10px;padding:12px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box;">
+        <textarea id="fbText" placeholder="Write your feedback..."></textarea>
+
+        <div class="popup-buttons">
+            <button class="submit-btn" onclick="submitFeedback()">Submit</button>
+            <button class="close-btn" onclick="closeFeedback()">Close</button>
+        </div>
+
+    </div>
+</div>
+
+<div id="footer"></div>
+
+<script src="./assets/js/header-footer.js"></script>
+<script src="./assets/js/api-config.js"></script>
+<script src="./assets/js/contactus.js"></script>
+
+</body>
+</html>

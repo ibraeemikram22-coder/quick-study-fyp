@@ -1,0 +1,253 @@
+:root {
+  --dark: #c988ee;
+  --primary: #f3e24c;
+  --secondary: #32c9c4;
+  --text: #333;
+}
+
+/* Header colors locked — same on Home + all pages (not overridden by module CSS) */
+#main-header .main-nav a {
+  color: #eee !important;
+  border-bottom: 3px solid transparent !important;
+}
+#main-header .main-nav a:hover,
+#main-header .main-nav a.active {
+  color: #ffeb3a !important;
+  border-bottom-color: #ffeb3a !important;
+}
+#main-header .cta-button {
+  background: #e4cd00 !important;
+  color: #634372 !important;
+  border-radius: 6px !important;
+  font-weight: 900 !important;
+  padding: 8px 14px !important;
+  text-decoration: none !important;
+  transition: 0.3s ease !important;
+}
+#main-header .cta-button:hover {
+  background: #32c9c4 !important;
+  color: #fff !important;
+}
+#main-header .logo .sub-text {
+  color: #32c9c4 !important;
+}
+#main-header{
+  background:linear-gradient(135deg,var(--dark),#634372);
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  z-index:9999;
+  height: 80px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.3);
+}
+#main-header .container{
+  max-width:1200px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 18px;
+}
+.logo{
+  display:flex;
+  flex-direction:column;
+}
+.logo .main-logo-text{
+  font-size:1.5em;
+  font-weight:900;
+  color:#fff;
+}
+.logo .sub-text{color:var(--secondary);}
+.logo .tagline{
+  font-size:0.8em;
+  color:#ddd;
+  margin-top:-4px;
+}
+
+/* nav */
+.main-nav{
+  display:flex;
+  align-items:center;
+}
+.main-nav a{
+  margin-left:18px;
+  color:#eee;
+  font-weight:600;
+  font-size:0.95em;
+  padding-bottom:5px;
+  border-bottom:3px solid transparent;
+  text-decoration:none;   /* 🔥 FIX */
+  transition:0.3s;
+}
+
+.main-nav a:hover{
+  color:var(--primary);
+  border-bottom-color:var(--primary);
+}
+.main-nav a.active{
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+.cta-button{
+  background:var(--primary);
+  padding:8px 14px;
+  border-radius:6px;
+  color:#634372;
+  font-weight:900;
+}
+.cta-button:hover{
+  background:var(--secondary);
+  color:#fff;
+}
+
+/* hamburger */
+.hamburger{
+  display:none;
+  width:44px;
+  height:44px;
+  background:transparent;
+  border:none;
+  color:#fff;
+  font-size:1.3em;
+  cursor:pointer;
+}
+
+/* mobile menu */
+.mobile-menu-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.45);
+  z-index:9998;   /* 🔥 header se just below */
+}
+.mobile-menu{
+  position:fixed;
+  top:80px;
+  right:-100%;              /* start hidden */
+  width:78%;
+  max-width:320px;
+  height:calc(100% - 80px);
+  background:#fff;
+  padding:18px;
+  transition:0.3s ease;
+}
+
+/* when active */
+.mobile-menu-overlay.active .mobile-menu{
+  right:0;
+}
+.mobile-menu a{
+  display:block;
+  padding:12px;
+  margin:8px 0;
+  color:var(--text);
+  font-weight:700;
+  text-decoration:none;   /* 🔥 FIX */
+  border-radius:8px;
+  transition:0.3s;
+}
+.mobile-menu a:hover{
+  background:linear-gradient(90deg,var(--primary),var(--secondary));
+  color:#fff;
+}
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .main-nav {
+    display: none;
+  }
+
+  .hamburger {
+    display: block;
+  }
+}
+
+/* show menu */
+.mobile-menu-overlay.active {
+  display: block;
+}
+/* ================= FOOTER ================= */
+#main-footer{
+  background: var(--dark);
+  color:#fff;
+  padding:60px 0 25px;
+}
+
+.footer-container{
+  max-width:1200px;
+  margin:auto;
+  padding:0 20px;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:40px;
+}
+
+.footer-col h4{
+  color: var(--secondary);
+  margin-bottom:15px;
+}
+
+.footer-col p,
+.footer-col a{
+  display:block;
+  color:#ddd;
+  margin-bottom:8px;
+  font-size:14px;
+}
+
+.footer-col a:hover{
+  color: var(--primary);
+}
+
+.footer-bottom{
+  text-align:center;
+  margin-top:40px;
+  color:#bbb;
+  font-size:14px;
+}
+
+/* MOBILE */
+@media (max-width:768px){
+  .footer-container{
+    grid-template-columns:1fr;
+    text-align:center;
+  }
+}
+
+/* ================= MOBILE MENU (FIXED) ================= */
+
+/* overlay hidden by default */
+.mobile-menu-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.45);
+  z-index:9998;
+
+  opacity:0;
+  visibility:hidden;
+  transition:0.3s ease;
+}
+
+/* show overlay */
+.mobile-menu-overlay.active{
+  opacity:1;
+  visibility:visible;
+}
+
+/* menu box */
+.mobile-menu{
+  position:fixed;
+  top:80px;
+  right:-100%;
+  width:78%;
+  max-width:320px;
+  height:calc(100% - 80px);
+  background:#fff;
+  padding:18px;
+  transition:0.3s ease;
+}
+
+/* slide in */
+.mobile-menu-overlay.active .mobile-menu{
+  right:0;
+}

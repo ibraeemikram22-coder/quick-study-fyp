@@ -1,0 +1,102 @@
+/* Humanizer-specific — shared layout in module-ui.css */
+
+.result-box {
+  position: relative;
+}
+#status-alert {
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+#status-alert.success {
+    color: green;
+}
+
+#status-alert.error {
+    color: red;
+}
+
+#status-alert.loading {
+    color: orange;
+}
+
+#input-stats {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #555;
+}
+
+#clear-btn {
+    position: absolute;
+    top: 10px;
+    right: 90px;
+    background: #dc3545;
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+#status-alert {
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+#status-alert.success { color: green; }
+#status-alert.error { color: red; }
+#status-alert.loading { color: orange; }
+
+#word-details {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 15px;
+    border: 1px solid #eee;
+}
+
+#word-details p {
+    margin: 5px 0;
+    font-weight: 500;
+}
+.copy-btn {
+    background: linear-gradient(135deg, #32c9c4, #b081d2);
+    border: none;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    border-radius: 10px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.copy-btn:hover {
+    transform: scale(1.02);
+}
+
+#status-alert {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+#status-alert.success { color: green; }
+#status-alert.error { color: red; }
+#status-alert.loading { color: orange; }
+
+.human-meta {
+    margin-top: 15px;
+    background: #fff;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    font-size: 14px;
+}
+
+#input-limit {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}

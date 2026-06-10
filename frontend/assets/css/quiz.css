@@ -1,0 +1,149 @@
+/* Quiz-specific — shared layout in module-ui.css */
+
+.output-box.quiz-mode {
+  border-style: solid;
+  border-color: var(--ui-dark, #b081d2);
+}
+
+/* ================= INPUT BADGE ================= */
+.input-badge{
+  background:#f1f1f1;
+  padding:6px 14px;
+  border-radius:20px;
+  font-weight:600;
+  display:inline-block;
+  margin-bottom:10px;
+}
+
+/* ================= QUIZ UI ================= */
+.quiz-wrapper{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.score-bar{
+  background:#fff;
+  padding:10px 16px;
+  border-radius:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.08);
+  font-weight:600;
+  font-size:14px;
+}
+
+.quiz-card{
+  background:#ffffff;
+  border-radius:18px;
+  padding:20px 22px;
+  box-shadow:0 12px 35px rgba(0,0,0,0.10);
+  animation:fadeIn 0.4s ease;
+}
+
+.output-box.quiz-mode.quiz-card{
+  min-height:auto;
+  max-height:none;
+}
+
+/* progress pill */
+.quiz-progress{
+  background:#f3f3f3;
+  display:inline-block;
+  padding:5px 14px;
+  border-radius:20px;
+  font-size:14px;
+  font-weight:600;
+  margin-bottom:12px;
+}
+
+/* question */
+.quiz-question{
+  font-size:17px;
+  font-weight:600;
+  margin-bottom:10px;
+  line-height:1.45;
+}
+
+/* options */
+.quiz-options{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.quiz-options button{
+  width:100%;
+  text-align:left;
+  padding:10px 14px;
+  border-radius:10px;
+  margin-bottom:0;
+  font-weight:500;
+  transition:0.2s;
+  white-space:normal;
+  line-height:1.35;
+}
+
+.quiz-options button:hover{
+  transform:translateY(-1px);
+}
+
+/* option states */
+.quiz-options button.correct{
+  background:rgba(25,135,84,0.15);
+  border-color:#198754;
+  color:#198754;
+}
+
+.quiz-options button.wrong{
+  background:rgba(220,53,69,0.15);
+  border-color:#dc3545;
+  color:#dc3545;
+}
+.quiz-card h5 {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.option-btn {
+  white-space: normal;
+}
+
+/* feedback */
+.feedback{
+  font-weight:600;
+  margin-top:10px;
+}
+
+.feedback.correct{color:#198754;}
+.feedback.wrong{color:#dc3545;}
+
+/* next button */
+.next-btn{
+  background:var(--secondary);
+  color:#fff;
+  border:none;
+  border-radius:22px;
+  padding:7px 20px;
+  font-weight:600;
+  float:right;
+  margin-top:16px;
+}
+
+.next-btn:hover{
+  background:var(--dark);
+}
+
+/* animation */
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(6px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.option-btn {
+  width: 100%;
+  text-align: left;
+  transition: 0.3s;
+}
+
+.option-btn:hover {
+  transform: scale(1.02);
+}

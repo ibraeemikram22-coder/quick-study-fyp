@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Question Bank Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/home.css">
+  <link rel="stylesheet" href="../../assets/css/module-ui.css">
+  <link rel="stylesheet" href="../../assets/css/questionbank-admin.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+</head>
+<body>
+  <div id="header"></div>
+
+  <section class="admin-hero">
+    <div class="container">
+      <h1 class="fw-bold">Question Bank <span class="text-primary">Admin</span></h1>
+      <p class="lead mb-0">Board → Subject → Book → Chapter (paste) → Generate questions → Database</p>
+      <a href="../../admin/dashboard.html" class="btn btn-sm btn-outline-secondary mt-2">
+        <i class="fas fa-arrow-left me-1"></i> Back to Admin Control Panel
+      </a>
+    </div>
+  </section>
+
+  <section class="pb-5">
+    <div class="container">
+      <p id="adminStatus" class="status-bar mb-3">Loading...</p>
+
+      <div class="admin-card mb-3 quick-start">
+        <h5 class="mb-2"><i class="fas fa-circle-info me-1"></i> Quick start</h5>
+        <ol class="small mb-2 ps-3">
+          <li>Start backend: <code>cd backend && python app.py</code> (port 3000)</li>
+          <li>First time: click <strong>Load sample data</strong> for boards, Physics, and sample chapters</li>
+          <li><strong>Setup</strong> → add your board, subject, book, and paper pattern</li>
+          <li><strong>Chapters</strong> → paste text → Save to database</li>
+          <li><strong>Generate</strong> → AI creates questions (Gemini; n8n optional)</li>
+          <li><strong>Teacher</strong> dashboard → generate papers from the database</li>
+        </ol>
+        <button type="button" class="btn btn-outline-primary btn-sm" id="seedSampleBtn">
+          <i class="fas fa-database me-1"></i>Load sample data
+        </button>
+        <span class="text-muted small ms-2">Set <code>GEMINI_API_KEY</code> in <code>backend/.env</code> for question generation</span>
+      </div>
+
+      <ul class="nav nav-pills mb-3 flex-wrap" id="adminTabs">
+        <li class="nav-item"><button class="nav-link active" data-tab="setup">Setup</button></li>
+        <li class="nav-item"><button class="nav-link" data-tab="chapters">Chapters</button></li>
+        <li class="nav-item"><button class="nav-link" data-tab="generate">Generate</button></li>
+        <li class="nav-item"><button class="nav-link" data-tab="questions">Questions</button></li>
+        <li class="nav-item"><button class="nav-link" data-tab="import">Import JSON</button></li>
+        <li class="nav-item"><button class="nav-link" data-tab="json">JSON Preview</button></li>
+      </ul>
+
+      <!-- SETUP -->
+      <div class="tab-panel" data-panel="setup">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="admin-card">
+              <h5>Board</h5>
+              <input id="boardName" class="form-control mb-2" placeholder="Punjab Board">
+              <input id="boardCode" class="form-control mb-2" placeholder="punjab">
+              <button class="btn btn-primary btn-sm" id="addBoardBtn">Add Board</button>
+              <ul id="boardList" class="mt-3 small"></ul>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="admin-card">
+              <h5>Class</h5>
+              <input id="className" class="form-control mb-2" placeholder="1st Year">
+              <select id="classBoardId" class="form-select mb-2"></select>
+              <button class="btn btn-primary btn-sm" id="addClassBtn">Add Class</button>
+              <ul id="classList" class="mt-3 small"></ul>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="admin-card">
+              <h5>Exam Type</h5>
+              <input id="examName" class="form-control mb-2" placeholder="Mids">
+              <input id="examCode" class="form-control mb-2" placeholder="mid">
+              <button class="btn btn-primary btn-sm" id="addExamBtn">Add Exam</button>
+              <ul id="examList" class="mt-3 small"></ul>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="admin-card">
+              <h5>Subject</h5>
+              <input id="subjectName" class="form-control mb-2" placeholder="Physics">
+              <button class="btn btn-primary btn-sm" id="addSubjectBtn">Add Subject</button>
+              <ul id="subjectList" class="mt-3 small"></ul>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="admin-card">
+              <h5>Book</h5>
+              <select id="bookSubjectId" class="form-select mb-2"></select>
+              <input id="bookName" class="form-control mb-2" placeholder="PTB Physics">
+              <button class="btn btn-primary btn-sm" id="addBookBtn">Add Book</button>
+              <ul id="bookList" class="mt-3 small"></ul>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="admin-card">
+              <h5>Paper Pattern</h5>
+              <select id="patternBoardId" class="form-select mb-2"></select>
+              <select id="patternExamId" class="form-select mb-2"></select>
+              <div class="row g-2">
+                <div class="col-4"><input id="patMcq" class="form-control" type="number" value="15" placeholder="MCQ"></div>
+                <div class="col-4"><input id="patShort" class="form-control" type="number" value="10" placeholder="Short"></div>
+                <div class="col-4"><input id="patLong" class="form-control" type="number" value="5" placeholder="Long"></div>
+              </div>
+              <button class="btn btn-primary btn-sm mt-2" id="addPatternBtn">Save Pattern</button>
+              <ul id="patternList" class="mt-3 small"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAPTERS -->
+      <div class="tab-panel d-none" data-panel="chapters">
+        <div class="admin-card">
+          <h5>Add Chapter (paste lecture / book text)</h5>
+          <select id="chapterBookId" class="form-select mb-2"></select>
+          <input id="chapterTitle" class="form-control mb-2" placeholder="Ch1 Motion">
+          <textarea id="chapterContent" class="form-control mb-2" rows="8" placeholder="Paste chapter text here..."></textarea>
+          <button class="btn btn-success" id="saveChapterBtn"><i class="fas fa-save me-1"></i>Save to Database</button>
+          <ul id="chapterList" class="mt-3"></ul>
+        </div>
+      </div>
+
+      <!-- GENERATE -->
+      <div class="tab-panel d-none" data-panel="generate">
+        <div class="admin-card">
+          <h5>Generate Questions (AI built-in — no n8n required)</h5>
+          <p class="text-muted small">Uses GEMINI_API_KEY from backend/.env. Optional: set N8N_QUESTION_WEBHOOK_URL for n8n.</p>
+          <select id="genChapterId" class="form-select mb-2"></select>
+          <div class="row g-2 mb-2">
+            <div class="col-4"><label class="small">MCQs</label><input id="genMcq" type="number" class="form-control" value="5"></div>
+            <div class="col-4"><label class="small">Short</label><input id="genShort" type="number" class="form-control" value="3"></div>
+            <div class="col-4"><label class="small">Long</label><input id="genLong" type="number" class="form-control" value="2"></div>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="useN8n">
+            <label class="form-check-label" for="useN8n">Send to n8n webhook instead</label>
+          </div>
+          <button class="btn btn-warning" id="generateQuestionsBtn">
+            <i class="fas fa-robot me-1"></i>Generate & Save Questions
+          </button>
+        </div>
+      </div>
+
+      <!-- QUESTIONS -->
+      <div class="tab-panel d-none" data-panel="questions">
+        <div class="admin-card">
+          <h5>Questions in database</h5>
+          <select id="viewChapterId" class="form-select mb-2"></select>
+          <button class="btn btn-outline-secondary btn-sm mb-2" id="refreshQuestionsBtn">Refresh</button>
+          <div id="questionsTable" class="small"></div>
+        </div>
+      </div>
+
+      <!-- IMPORT JSON -->
+      <div class="tab-panel d-none" data-panel="import">
+        <div class="admin-card">
+          <h5>Import questions (paste JSON)</h5>
+          <p class="text-muted small mb-2">
+            If n8n cannot reach localhost, paste JSON here to save questions manually.
+            Format: <code>{"questions":[{ "questionType":"mcq", "questionText":"...", "options":[], "correctAnswer":"A" }]}</code>
+          </p>
+          <select id="importChapterId" class="form-select mb-2"></select>
+          <textarea id="importJsonText" class="form-control mb-2 font-monospace" rows="12" placeholder='{"questions":[...]}'></textarea>
+          <button type="button" class="btn btn-success" id="importJsonBtn">
+            <i class="fas fa-file-import me-1"></i>Import to Database
+          </button>
+        </div>
+      </div>
+
+      <!-- JSON -->
+      <div class="tab-panel d-none" data-panel="json">
+        <div class="admin-card">
+          <h5>Last API JSON response</h5>
+          <pre id="jsonPreview" class="json-preview">{}</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="module-guide-section">
+    <div class="container">
+      <div class="module-guide">
+        <h5><i class="fas fa-circle-info me-2"></i>How to use Question Bank Admin</h5>
+        <p class="guide-lead">Set up your syllabus once — teachers then generate papers from stored questions.</p>
+        <div class="module-guide-steps guide-cols-2">
+          <div class="module-guide-step">
+            <span class="step-num">1</span>
+            <div>
+              <h6>Setup tab — structure</h6>
+              <p>Add board, class, exam type, subject, book, and paper pattern (how many MCQs, short, and long questions per paper).</p>
+            </div>
+          </div>
+          <div class="module-guide-step">
+            <span class="step-num">2</span>
+            <div>
+              <h6>Chapters tab — content</h6>
+              <p>Select a book, enter a chapter title, paste lecture or textbook text, and save. This text is used to generate questions.</p>
+            </div>
+          </div>
+          <div class="module-guide-step">
+            <span class="step-num">3</span>
+            <div>
+              <h6>Generate tab — AI questions</h6>
+              <p>Pick a chapter and set counts. Click generate — questions are saved to the database automatically (about 30–60 seconds).</p>
+            </div>
+          </div>
+          <div class="module-guide-step">
+            <span class="step-num">4</span>
+            <div>
+              <h6>Review &amp; import</h6>
+              <p>Use the Questions tab to view saved items. Import JSON if you have questions from an external tool. Teachers use their dashboard to build final papers.</p>
+            </div>
+          </div>
+        </div>
+        <div class="module-guide-tip">
+          <i class="fas fa-lightbulb me-2"></i>
+          <strong>Tip:</strong> n8n is optional — built-in Gemini generation works without it. Load sample data on first run to see a working demo.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer"></div>
+  <script src="../../assets/js/header-footer.js"></script>
+  <script src="../../assets/js/api-config.js"></script>
+  <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/questionbank-admin.js"></script>
+  <script>
+    const adminUser = requireLogin(["admin"]);
+    if (adminUser) showDashboardBar(adminUser, "Admin — Question Bank");
+  </script>
+</body>
+</html>

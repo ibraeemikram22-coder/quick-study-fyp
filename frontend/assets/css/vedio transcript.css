@@ -1,0 +1,35 @@
+/* Transcript-only extras — shared UI in module-ui.css */
+
+.transcript-how {
+  width: 100%;
+}
+.transcript-how ul li {
+  margin-bottom: 0.35rem;
+  line-height: 1.5;
+}
+
+.stats-row strong {
+  color: var(--ui-dark, #b081d2);
+}
+
+.output-panel {
+  min-height: 100%;
+}
+
+.file-name {
+  font-weight: 600;
+  color: var(--ui-dark, #b081d2);
+}
+
+.meta-badge.loading {
+  background: #fff3cd;
+  color: #856404;
+}
+.meta-badge.done {
+  background: #d4edda;
+  color: #155724;
+}
+.meta-badge.error {
+  background: #f8d7da;
+  color: #721c24;
+}

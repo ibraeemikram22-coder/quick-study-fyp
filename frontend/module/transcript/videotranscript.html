@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Video Transcript - Quick Study Builder</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/module-ui.css">
+<link rel="stylesheet" href="../../assets/css/vedio transcript.css">
+<link rel="stylesheet" href="../../assets/css/layout.css">
+</head>
+<body class="module-tool-page">
+<div id="header"></div>
+
+<section class="page-header">
+  <div class="container">
+    <h1>AI <span class="accent">Video Transcript</span></h1>
+    <p class="lead">YouTube link or uploaded video → full text transcript</p>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+
+      <div class="col-lg-5">
+        <div class="tool-box">
+          <div class="mode-tabs mb-3">
+            <button type="button" class="mode-tab active" data-mode="link">
+              <i class="fab fa-youtube me-1"></i> YouTube Link
+            </button>
+            <button type="button" class="mode-tab" data-mode="upload">
+              <i class="fas fa-file-video me-1"></i> Upload Video
+            </button>
+          </div>
+
+          <div id="panel-link">
+            <label class="form-label fw-semibold">Video URL</label>
+            <input type="url" id="videoLink" class="form-control transcript-input"
+              placeholder="https://www.youtube.com/watch?v=..." />
+            <p class="hint-text mt-2">
+              Works with or without CC. Copyright-blocked videos show a clear message.
+            </p>
+          </div>
+
+          <div id="panel-upload" class="d-none">
+            <div class="drop-area" id="dropArea">
+              <i class="fas fa-cloud-upload-alt fa-3x mb-2 text-secondary"></i>
+              <p class="fw-semibold mb-1">Drop video here or click to browse</p>
+              <p class="small text-muted mb-0">MP4, WebM, MP3, WAV — max 20 MB</p>
+              <p class="file-name mt-2" id="fileName">No file selected</p>
+            </div>
+            <input type="file" id="videoFile" accept="video/*,audio/*,.mp4,.webm,.mkv,.mov,.mp3,.wav,.m4a" hidden />
+          </div>
+
+          <div id="status-alert" class="status-alert mt-3" role="status">Ready</div>
+
+          <div class="d-flex gap-2 mt-3 flex-wrap">
+            <button class="action-btn" id="generateBtn" type="button">
+              <i class="fas fa-microphone me-2"></i>Generate Transcript
+            </button>
+            <button class="small-btn" id="clearBtn" type="button">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="tool-box output-panel">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <h4 class="fw-bold mb-0">Transcript Output</h4>
+            <span id="metaBadge" class="meta-badge">Waiting</span>
+          </div>
+
+          <div class="output-box" id="outputBox">
+            Your transcript will appear here...
+          </div>
+
+          <div class="stats-row mt-2 small text-muted">
+            <span>Words: <strong id="wordCount">0</strong></span>
+            <span class="ms-3">Source: <strong id="sourceLabel">—</strong></span>
+          </div>
+
+          <div class="d-flex gap-2 mt-3 flex-wrap">
+            <button class="small-btn" id="copyBtn" type="button" disabled>
+              <i class="fas fa-copy me-1"></i>Copy
+            </button>
+            <button class="small-btn" id="downloadBtn" type="button" disabled>
+              <i class="fas fa-download me-1"></i>Download
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="admin-card mt-4">
+      <h5 class="mb-2"><i class="fas fa-clock-rotate-left me-1"></i> Recent history (database)</h5>
+      <p class="small text-muted">Last transcripts are saved automatically. Admin can view all in Admin Panel → Transcripts.</p>
+      <div id="historyList"></div>
+    </div>
+
+  </div>
+</section>
+
+<section class="module-guide-section">
+  <div class="container">
+    <div class="module-guide">
+      <h5><i class="fas fa-circle-info me-2"></i>How to use Video Transcript</h5>
+      <p class="guide-lead">Get a readable text version of any YouTube video or uploaded lecture clip.</p>
+      <div class="module-guide-steps guide-cols-2">
+        <div class="module-guide-step">
+          <span class="step-num">1</span>
+          <div>
+            <h6>Choose input type</h6>
+            <p>Use <strong>YouTube Link</strong> for online videos, or <strong>Upload Video</strong> for a local file (max 20 MB).</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">2</span>
+          <div>
+            <h6>Start transcription</h6>
+            <p>Paste the URL or drop your file, then click generate. YouTube captions are used when available for faster, accurate results.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">3</span>
+          <div>
+            <h6>Read the output</h6>
+            <p>Lines follow the spoken order in <strong>Roman Urdu / Roman English</strong> — easy to read, not Hindi script.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">4</span>
+          <div>
+            <h6>Copy or download</h6>
+            <p>Use the transcript in Summarizer for short notes, or in Quiz / Student Paper to build questions from the lecture.</p>
+          </div>
+        </div>
+      </div>
+      <div class="module-guide-tip">
+        <i class="fas fa-lightbulb me-2"></i>
+        <strong>Note:</strong> Copyright-blocked or unavailable videos show a clear error message instead of a partial transcript.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="../../assets/js/header-footer.js"></script>
+<script src="../../assets/js/api-config.js"></script>
+<script src="../../assets/js/transcript.js"></script>
+</body>
+</html>

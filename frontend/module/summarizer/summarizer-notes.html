@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Summarized Notes - Quick Study Builder</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/module-ui.css">
+<link rel="stylesheet" href="../../assets/css/summarizer notes.css">
+<link rel="stylesheet" href="../../assets/css/layout.css">
+</head>
+<body class="module-tool-page">
+  <div id="header"></div>
+
+<section class="page-header">
+<div class="container">
+<h1>AI <span class="accent">Summarized Notes</span></h1>
+<p class="lead">Convert lectures into clean bullet notes</p>
+</div>
+</section>
+
+<section class="py-5">
+<div class="container">
+<div class="row g-4">
+
+<div class="col-lg-6">
+<div class="notes-box">
+<h4 class="fw-bold mb-3">Paste Transcript / Lecture</h4>
+<textarea id="inputText" placeholder="Paste lecture or chapter text here..."></textarea>
+<p class="text-muted small mb-0">Paste text or import a file, then click <strong>Generate Summary</strong>.</p>
+
+<div id="fileChip" class="file-chip d-none">
+  <i class="fas fa-file-alt"></i>
+  <span id="fileChipName">—</span>
+  <span id="fileChipSize" class="file-chip-size"></span>
+  <button type="button" class="file-chip-remove" id="clearFileBtn" title="Remove file">&times;</button>
+</div>
+
+<div class="status-tracker mt-3" id="statusTracker">
+  <div class="status-step" data-step="idle">
+    <span class="status-dot"></span>
+    <span>Ready</span>
+  </div>
+  <div class="status-step" data-step="upload">
+    <span class="status-dot"></span>
+    <span>File uploaded</span>
+  </div>
+  <div class="status-step" data-step="processing">
+    <span class="status-dot"></span>
+    <span>Backend summarizing</span>
+  </div>
+  <div class="status-step" data-step="done">
+    <span class="status-dot"></span>
+    <span>Complete</span>
+  </div>
+</div>
+<p class="status-message mt-2 mb-0" id="statusMessage">Paste text or import a file, then generate.</p>
+
+<div class="mt-3 form-check">
+<input class="form-check-input" type="checkbox" id="quickMode">
+<label class="form-check-label" for="quickMode">
+  Quick only (first ~15 pages) — leave <strong>unchecked</strong> to summarize the <strong>whole file</strong>
+</label>
+</div>
+
+<div class="mt-3">
+<label class="fw-semibold">Summary language:</label>
+<select id="outputLanguage" class="form-select w-75 mt-1">
+  <option value="same" selected>Same as input (Urdu in → Urdu out)</option>
+  <option value="urdu">Urdu</option>
+  <option value="english">English</option>
+</select>
+</div>
+
+<div class="mt-3">
+<label class="fw-semibold">Content type:</label>
+<select id="contentType" class="form-select w-75 mt-1">
+  <option value="notes" selected>General notes / chapter</option>
+  <option value="math">Math &amp; numerical (steps + answers)</option>
+</select>
+<p class="text-muted small mt-1 mb-0">Math mode: explains steps for problems in the text. Not a calculator for photos-only PDFs.</p>
+</div>
+
+<div class="mt-3">
+<label class="fw-semibold">Output format:</label>
+<select id="formatStyle" class="form-select w-75 mt-1">
+  <option value="chapter" selected>Chapter notes (headings + bullets)</option>
+  <option value="bullets">Simple bullets only (no headings)</option>
+</select>
+</div>
+
+<div class="mt-3">
+<label class="fw-semibold">Total bullet points (all sections):</label>
+<select id="bulletCount" class="form-select w-50 mt-1">
+  <option value="3">3</option>
+  <option value="5" selected>5</option>
+  <option value="7">7</option>
+  <option value="10">10</option>
+  <option value="15">15</option>
+</select>
+<p class="text-muted small mt-1 mb-0">Whole file: every part is read, then one merged summary (progress bar). Large PDFs may take a few minutes.</p>
+</div>
+
+<div class="d-flex gap-2 mt-4 flex-wrap">
+<button class="action-btn" id="generateBtn">
+<i class="fas fa-magic me-2"></i>Generate Summary
+</button>
+<button class="small-btn" id="clearBtn">Clear</button>
+<button class="small-btn" id="importBtn"><i class="fas fa-upload me-1"></i>Import File</button>
+</div>
+
+<input type="file" id="fileInput" accept=".txt,.pdf,.docx" hidden>
+</div>
+</div>
+
+<div class="col-lg-6">
+<div class="notes-box">
+<h4 class="fw-bold mb-3">Summarized Notes</h4>
+<div id="summaryFlow" class="summary-flow d-none mb-3">
+  <div class="flow-step" data-flow="prepare"><span>1</span> Prepare</div>
+  <div class="flow-step" data-flow="parts"><span>2</span> Read all parts</div>
+  <div class="flow-step" data-flow="merge"><span>3</span> Merge full story</div>
+  <div class="flow-step" data-flow="done"><span>4</span> Notes ready</div>
+</div>
+<div class="progress d-none mb-3" id="progressBarWrap">
+  <div class="progress-bar" id="progressBar" style="width:0%"></div>
+</div>
+<div class="output-box summary-output" id="outputBox">Your summarized notes will appear here...</div>
+
+<div id="statsPanel" class="stats-panel d-none mt-3">
+  <div class="stat-card">
+    <span class="stat-label">Original words</span>
+    <strong id="statOriginal">0</strong>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Summary words</span>
+    <strong id="statSummary">0</strong>
+  </div>
+  <div class="stat-card highlight">
+    <span class="stat-label">Shortened by</span>
+    <strong id="statReduction">0%</strong>
+  </div>
+</div>
+
+<div id="insightsPanel" class="insights-panel d-none mt-3">
+  <h5 class="insights-title"><i class="fas fa-lightbulb me-2"></i>What changed?</h5>
+
+  <div class="insight-block">
+    <h6><i class="fas fa-trash-alt me-1"></i> Removed / merged</h6>
+    <ul id="insightRemoved" class="insight-list"></ul>
+  </div>
+
+  <div class="insight-block">
+    <h6><i class="fas fa-language me-1"></i> Simplified terms</h6>
+    <ul id="insightSimplified" class="insight-list"></ul>
+  </div>
+
+  <div class="insight-block">
+    <h6><i class="fas fa-bookmark me-1"></i> Key terms kept</h6>
+    <div id="insightKept" class="insight-tags"></div>
+  </div>
+</div>
+
+<div class="d-flex gap-2 mt-3 flex-wrap">
+<button class="small-btn" id="copyBtn">Copy Summary</button>
+<button class="small-btn" id="downloadBtn">Download</button>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+    <div class="admin-card mt-4">
+      <h5 class="mb-2"><i class="fas fa-clock-rotate-left me-1"></i> Recent history (MySQL)</h5>
+      <div id="moduleHistoryList"></div>
+    </div>
+</section>
+
+<section class="module-guide-section">
+  <div class="container">
+    <div class="module-guide">
+      <h5><i class="fas fa-circle-info me-2"></i>How to use AI Summarized Notes</h5>
+      <p class="guide-lead">Compress long lectures or chapters into clear, study-ready notes.</p>
+      <div class="module-guide-steps guide-cols-2">
+        <div class="module-guide-step">
+          <span class="step-num">1</span>
+          <div>
+            <h6>Add your source</h6>
+            <p>Paste a transcript or chapter text, or <strong>Import File</strong> (TXT, PDF, DOCX). Large files are read in parts and merged.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">2</span>
+          <div>
+            <h6>Adjust settings</h6>
+            <p>Pick language, content type (general or math), output format, and how many bullet points you need. Leave Quick mode off to summarize the whole file.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">3</span>
+          <div>
+            <h6>Generate summary</h6>
+            <p>Click <strong>Generate Summary</strong> and watch the progress bar. Notes appear on the right with word-count stats.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">4</span>
+          <div>
+            <h6>Copy or download</h6>
+            <p>Use <strong>What changed?</strong> to see removed fluff and key terms kept. Copy or download the final notes for revision.</p>
+          </div>
+        </div>
+      </div>
+      <div class="module-guide-tip">
+        <i class="fas fa-lightbulb me-2"></i>
+        <strong>Tip:</strong> Pair this with Video Transcript — transcribe a lecture first, then paste the text here for short notes.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="../../assets/js/header-footer.js"></script>
+<script src="../../assets/js/api-config.js"></script>
+<script src="../../assets/js/module-history.js"></script>
+<script src="../../assets/js/summarizer.js"></script>
+</body>
+</html>

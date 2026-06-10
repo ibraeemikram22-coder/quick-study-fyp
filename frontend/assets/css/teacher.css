@@ -1,0 +1,9 @@
+/* Teacher dashboard — shared boxes in module-ui.css */
+
+.paper-preview {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  border: 2px dashed var(--ui-secondary, #32c9c4);
+  min-height: 200px;
+}

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Generate Paper — Quick Study Builder</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/home.css">
+<link rel="stylesheet" href="../../assets/css/module-ui.css">
+<link rel="stylesheet" href="../../assets/css/student.css">
+<link rel="stylesheet" href="../../assets/css/questionbank-student.css">
+<link rel="stylesheet" href="../../assets/css/layout.css">
+</head>
+<body>
+
+<div id="header"></div>
+
+<section class="page-header">
+  <div class="container">
+    <h1>Student <span>Generate Paper</span></h1>
+    <p class="lead mb-0">Build a practice paper or take a timed test from your own notes</p>
+  </div>
+</section>
+
+<section class="py-5">
+<div class="container">
+
+<div class="dashboard-box mb-4 no-print">
+  <h5 class="fw-bold mb-3"><i class="fas fa-sliders me-2"></i>Select mode</h5>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="mode-card active" data-mode="practice" id="modePractice">
+        <h6><i class="fas fa-file-word me-1"></i> Practice paper</h6>
+        <p class="small text-muted mb-0">Questions only — download as Word, print, or edit. No answer lines, like a real question paper.</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mode-card" data-mode="test" id="modeTest">
+        <h6><i class="fas fa-clock me-1"></i> Timed test</h6>
+        <p class="small text-muted mb-0">Solve on this page with a countdown timer. Time is set from your question mix. Submit to see your score.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 no-print">
+  <div class="col-lg-7">
+    <div class="dashboard-box">
+      <h4 class="fw-bold mb-3"><i class="fas fa-file-upload me-2"></i>Your notes / book</h4>
+      <input type="file" class="form-control mb-2" id="fileInput" accept=".pdf,.txt,.docx">
+      <p id="fileSizeHint" class="small text-muted mb-2" style="display:none;"></p>
+      <div id="uploadErrorBox" class="upload-error-box" style="display:none;" role="alert"></div>
+      <p class="small text-muted mb-2">PDF / DOCX / TXT · max 80 MB · 700+ page books: compress ya chapters alag upload karein</p>
+      <p class="text-center small text-muted mb-2">OR paste text</p>
+      <textarea class="form-control" id="textInput" rows="6"
+        placeholder="Paste chapter, lecture notes, or book pages (one paragraph minimum)..."></textarea>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="dashboard-box h-100">
+      <h5 class="fw-bold mb-3">Question types</h5>
+      <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+        <button type="button" class="select-btn active" data-type="mcq">MCQ</button>
+        <input type="number" value="8" min="0" max="30" class="form-control count-input" data-type="mcq" style="width:80px;">
+      </div>
+      <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+        <button type="button" class="select-btn active" data-type="short">Short</button>
+        <input type="number" value="3" min="0" max="15" class="form-control count-input" data-type="short" style="width:80px;">
+      </div>
+      <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+        <button type="button" class="select-btn" data-type="long">Long</button>
+        <input type="number" value="2" min="0" max="10" class="form-control count-input" data-type="long" style="width:80px;">
+      </div>
+      <p id="timeEstimate" class="small text-muted mb-2" style="display:none;"></p>
+      <button type="button" class="action-btn w-100" id="generateBtn">Generate Paper</button>
+      <p class="text-muted small mt-2 mb-0">Backend port 3000 · GEMINI_API_KEY in .env</p>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard-box mt-4 no-print" id="toolbarBox" style="display:none;">
+  <div class="paper-toolbar" id="paperToolbar">
+    <button type="button" class="small-btn tb-practice" id="btnWord"><i class="fas fa-file-word me-1"></i>Download Word</button>
+    <button type="button" class="small-btn tb-practice" id="btnWordKey"><i class="fas fa-key me-1"></i>Word + answer key</button>
+    <button type="button" class="small-btn tb-practice" id="btnPrint"><i class="fas fa-print me-1"></i>Print</button>
+    <button type="button" class="small-btn tb-practice" id="btnSave"><i class="fas fa-save me-1"></i>Save</button>
+    <button type="button" class="small-btn tb-test btn-submit-highlight is-hidden" id="btnSubmitTest"><i class="fas fa-check-circle me-1"></i>Submit test</button>
+    <button type="button" class="small-btn tb-test is-hidden" id="btnToggleKey"><i class="fas fa-eye me-1"></i>Answer key</button>
+  </div>
+</div>
+
+<div id="processingBar" class="processing-bar no-print" style="display:none;" aria-live="polite">
+  <div class="processing-bar-inner">
+    <div class="processing-head">
+      <span class="processing-spinner" aria-hidden="true"></span>
+      <span id="processingMessage" class="processing-title">Generating paper…</span>
+      <span id="processingPercent" class="processing-percent">0%</span>
+    </div>
+    <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div id="processingProgressFill" class="progress-fill"></div>
+    </div>
+    <div class="processing-foot">
+      <p id="processingStep" class="processing-step mb-0">Reading your file…</p>
+      <span id="processingTimer" class="processing-timer">00:00</span>
+    </div>
+  </div>
+</div>
+
+<div id="timerBar" class="timer-bar no-print" style="display:none;">
+  <span><i class="fas fa-hourglass-half me-2"></i>Time left</span>
+  <span id="timerDisplay">--:--</span>
+</div>
+
+<div id="scorePanel" class="score-panel no-print" style="display:none;"></div>
+
+<div class="mt-4" id="paperWrap" style="display:none;">
+  <div class="exam-paper-sheet" id="paperSheet"></div>
+</div>
+
+</div>
+</section>
+
+<section class="module-guide-section no-print">
+  <div class="container">
+    <div class="module-guide">
+      <h5><i class="fas fa-circle-info me-2"></i>How to use Student Generate Paper</h5>
+      <p class="guide-lead">Turn your notes, PDF, or DOCX into a custom paper in a few steps.</p>
+      <div class="module-guide-steps guide-cols-2">
+        <div class="module-guide-step">
+          <span class="step-num">1</span>
+          <div>
+            <h6>Pick a mode first</h6>
+            <p><strong>Practice paper</strong> gives you a clean question sheet for Word or printing. <strong>Timed test</strong> lets you attempt the paper online with a live timer.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">2</span>
+          <div>
+            <h6>Add your study material</h6>
+            <p>Upload a PDF, DOCX, or TXT file — or paste your chapter or lecture notes. The AI reads this content to build relevant questions.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">3</span>
+          <div>
+            <h6>Choose question types &amp; counts</h6>
+            <p>Toggle MCQ, Short, and Long questions and set how many of each you want. In timed mode, an estimated duration appears automatically.</p>
+          </div>
+        </div>
+        <div class="module-guide-step">
+          <span class="step-num">4</span>
+          <div>
+            <h6>Generate and use your paper</h6>
+            <p>Practice mode: download Word (questions only), print, or save. Timed mode: answer on screen, submit when done, then review your MCQ score and the answer key.</p>
+          </div>
+        </div>
+      </div>
+      <div class="module-guide-tip">
+        <i class="fas fa-lightbulb me-2"></i>
+        <strong>Tip:</strong> This module is different from the Quiz tool — here you get full papers (MCQ + short + long), Word export, and optional timed self-tests. Formal board headers are added on the Teacher dashboard.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+<script src="../../assets/js/header-footer.js"></script>
+<script src="../../assets/js/api-config.js"></script>
+<script src="../../assets/js/questionbank-student.js"></script>
+</body>
+</html>
