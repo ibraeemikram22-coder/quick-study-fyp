@@ -258,8 +258,17 @@ if (document.readyState === "loading") {
   loadChatbotWidget();
 }
 
+function resolveHealthApiBase() {
+  if (typeof API_BASE !== "undefined") return API_BASE;
+  const host = window.location.hostname;
+  if (host === "localhost" || host === "127.0.0.1") return "http://localhost:3000";
+  return window.location.origin;
+}
+
 function showBackendOfflineBanner() {
   if (document.getElementById("backend-offline-banner")) return;
+  const isLocal =
+    window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
   const bar = document.createElement("div");
   bar.id = "backend-offline-banner";
   bar.setAttribute("role", "alert");
@@ -267,20 +276,22 @@ function showBackendOfflineBanner() {
     "position:fixed;top:0;left:0;right:0;z-index:99999;background:#b91c1c;color:#fff;" +
     "padding:12px 16px;text-align:center;font-size:14px;font-family:system-ui,sans-serif;" +
     "box-shadow:0 2px 8px rgba(0,0,0,.25);";
-  bar.innerHTML =
-    "<strong>Service unavailable</strong> — Please run <strong>START_PROJECT.bat</strong> " +
-    "and keep the application window open.";
+  bar.innerHTML = isLocal
+    ? "<strong>Service unavailable</strong> — Please run <strong>START_PROJECT.bat</strong> " +
+      "and keep the application window open."
+    : "<strong>Service unavailable</strong> — Cannot reach the live backend. Please try again in a minute.";
   document.body.prepend(bar);
   document.body.style.paddingTop = "52px";
 }
 
 function checkBackendAndWarn() {
-  const apiBase = typeof API_BASE !== "undefined" ? API_BASE : "http://localhost:3000";
+  const apiBase = resolveHealthApiBase();
   fetch(`${apiBase}/api/health`, { method: "GET", cache: "no-store" })
     .then((r) => {
       if (r.ok) {
         const el = document.getElementById("backend-offline-banner");
         if (el) el.remove();
+        if (document.body.style.paddingTop === "52px") document.body.style.paddingTop = "";
         return;
       }
       showBackendOfflineBanner();
@@ -288,8 +299,4 @@ function checkBackendAndWarn() {
     .catch(() => showBackendOfflineBanner());
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => setTimeout(checkBackendAndWarn, 400));
-} else {
-  setTimeout(checkBackendAndWarn, 400);
-}
+window.addEventListener("load", () => setTimeout(checkBackendAndWarn, 300));
