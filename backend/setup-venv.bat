@@ -1,7 +1,7 @@
 @echo off
 cd /d "%~dp0"
 echo ============================================
-echo  Fix venv for: FYP-Smart-Learning (6)
+echo  Fix venv for this project folder
 echo ============================================
 echo.
 
@@ -13,31 +13,32 @@ if errorlevel 1 (
 )
 
 if exist venv (
-  echo Removing old venv (broken copy from another folder)...
+  echo Removing old venv...
   rmdir /s /q venv
 )
 
-echo Creating fresh venv in THIS folder...
+echo Creating fresh venv...
 python -m venv venv
-
-echo Installing packages...
 venv\Scripts\python.exe -m pip install --upgrade pip
-venv\Scripts\python.exe -m pip install flask flask-cors python-dotenv requests sqlalchemy
-echo Optional for Grammar page only:
-echo   venv\Scripts\python.exe -m pip install language-tool-python
+if exist requirements-deploy.txt (
+  venv\Scripts\python.exe -m pip install -r requirements-deploy.txt
+) else if exist requirements.txt (
+  venv\Scripts\python.exe -m pip install -r requirements.txt
+)
+venv\Scripts\python.exe -m pip install flask flask-cors python-dotenv requests sqlalchemy pymysql pypdf python-docx google-generativeai gunicorn
+
+powershell -NoProfile -Command "Set-Content -LiteralPath 'venv\.install_root' -Value '%CD%' -NoNewline"
+echo ok>.deps_ok
 
 echo.
-echo Testing sqlalchemy...
-venv\Scripts\python.exe -c "import sqlalchemy; print('sqlalchemy OK:', sqlalchemy.__version__)"
+echo Testing backend...
+venv\Scripts\python.exe -c "from app import app; print('Backend OK')"
 if errorlevel 1 (
-  echo INSTALL FAILED
+  echo INSTALL FAILED — read error above
   pause
   exit /b 1
 )
 
 echo.
-echo ============================================
-echo  Done! Start server with:
-echo  venv\Scripts\python.exe app.py
-echo ============================================
+echo Done! Use START_PROJECT.bat in project root.
 pause

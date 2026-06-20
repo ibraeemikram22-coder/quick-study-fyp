@@ -9,11 +9,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/css/home.css">
 <link rel="stylesheet" href="../../assets/css/module-ui.css">
+<link rel="stylesheet" href="../../assets/css/auth-portal.css">
 <link rel="stylesheet" href="../../assets/css/student.css">
 <link rel="stylesheet" href="../../assets/css/questionbank-student.css">
 <link rel="stylesheet" href="../../assets/css/layout.css">
 </head>
-<body>
+<body data-skip-usage-banner="1">
 
 <div id="header"></div>
 
@@ -26,6 +27,8 @@
 
 <section class="py-5">
 <div class="container">
+
+<div id="studentUserBar" class="module-role-bar" style="display:none" aria-live="polite"></div>
 
 <div class="dashboard-box mb-4 no-print">
   <h5 class="fw-bold mb-3"><i class="fas fa-sliders me-2"></i>Select mode</h5>
@@ -45,14 +48,14 @@
   </div>
 </div>
 
+<div id="studentAlert" class="student-alert no-print" style="display:none;" role="alert"></div>
+
 <div class="row g-4 no-print">
   <div class="col-lg-7">
     <div class="dashboard-box">
       <h4 class="fw-bold mb-3"><i class="fas fa-file-upload me-2"></i>Your notes / book</h4>
       <input type="file" class="form-control mb-2" id="fileInput" accept=".pdf,.txt,.docx">
-      <p id="fileSizeHint" class="small text-muted mb-2" style="display:none;"></p>
-      <div id="uploadErrorBox" class="upload-error-box" style="display:none;" role="alert"></div>
-      <p class="small text-muted mb-2">PDF / DOCX / TXT · max 80 MB · 700+ page books: compress ya chapters alag upload karein</p>
+      <p class="small text-muted mb-2">PDF / DOCX / TXT · max 50 MB · large books are sampled from many sections; generate again for new questions.</p>
       <p class="text-center small text-muted mb-2">OR paste text</p>
       <textarea class="form-control" id="textInput" rows="6"
         placeholder="Paste chapter, lecture notes, or book pages (one paragraph minimum)..."></textarea>
@@ -75,8 +78,10 @@
         <input type="number" value="2" min="0" max="10" class="form-control count-input" data-type="long" style="width:80px;">
       </div>
       <p id="timeEstimate" class="small text-muted mb-2" style="display:none;"></p>
-      <button type="button" class="action-btn w-100" id="generateBtn">Generate Paper</button>
-      <p class="text-muted small mt-2 mb-0">Backend port 3000 · GEMINI_API_KEY in .env</p>
+      <div class="d-flex gap-2 flex-wrap align-items-center">
+        <button type="button" class="action-btn flex-grow-1" id="generateBtn">Generate Paper</button>
+        <a class="small-btn history-btn" href="../history/saved.html?module=questionbank" target="_blank" rel="noopener">Saved</a>
+      </div>
     </div>
   </div>
 </div>
@@ -118,6 +123,14 @@
 
 <div class="mt-4" id="paperWrap" style="display:none;">
   <div class="exam-paper-sheet" id="paperSheet"></div>
+</div>
+
+<div class="dashboard-box mt-4 no-print" id="studentHistoryBox">
+  <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+    <h5 class="fw-bold mb-0"><i class="fas fa-clock-rotate-left me-2"></i>Your saved papers</h5>
+    <a class="small-btn history-btn" href="../history/saved.html?module=questionbank" target="_blank" rel="noopener">Open all</a>
+  </div>
+  <div id="studentHistoryList"></div>
 </div>
 
 </div>
@@ -169,6 +182,15 @@
 <div id="footer"></div>
 <script src="../../assets/js/header-footer.js"></script>
 <script src="../../assets/js/api-config.js"></script>
+<script src="../../assets/js/auth-sso.js"></script>
+<script src="../../assets/js/auth-session.js"></script>
+<script src="../../assets/js/auth-portal.js"></script>
+<script src="../../assets/js/friendly-errors.js"></script>
+<script src="../../assets/js/gemini-notice.js"></script>
+<script src="../../assets/js/module-history.js"></script>
 <script src="../../assets/js/questionbank-student.js"></script>
+<script>
+  if (requireLogin(["student"])) mountDashboardRoleBar("studentUserBar", "student");
+</script>
 </body>
 </html>

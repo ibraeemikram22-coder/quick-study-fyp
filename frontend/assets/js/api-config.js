@@ -1,56 +1,56 @@
-/** Backend base URL — must match: python app.py (port 3000) */
-const API_BASE = "http://localhost:3000";
-const MAX_UPLOAD_MB = 80;
-const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
+/**
+ * Backend API URL
+ * Local: START_PROJECT.bat (port 3000)
+ * Live: set PRODUCTION_API_URL below after deploying backend on Render/Railway
+ */
+const PRODUCTION_API_URL = ""; // e.g. "https://your-app.onrender.com"
 
-function formatFileSize(bytes) {
-  if (!bytes && bytes !== 0) return "";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function fileTooLargeMessage(fileSizeBytes) {
-  const size = formatFileSize(fileSizeBytes);
-  return (
-    `File bahut bara hai (${size}). Maximum ${MAX_UPLOAD_MB} MB upload ho sakta hai. ` +
-    `Your file is too large (${size}). Limit is ${MAX_UPLOAD_MB} MB.`
-  );
-}
-
-const FILE_TOO_LARGE_TIPS = [
-  "PDF compress karein — ilovepdf.com ya smallpdf.com use karein",
-  "Poori book ki jagah sirf 1–2 chapters upload karein",
-  "Ya chapter ka text neeche wale box mein paste karein",
-];
+const API_BASE = (() => {
+  const host = window.location.hostname;
+  if (host === "localhost" || host === "127.0.0.1") {
+    return "http://localhost:3000";
+  }
+  if (PRODUCTION_API_URL) {
+    return PRODUCTION_API_URL.replace(/\/$/, "");
+  }
+  return window.location.origin;
+})();
 
 async function apiFetch(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, options);
-  const contentType = res.headers.get("content-type") || "";
-  let data = {};
-
-  if (contentType.includes("application/json")) {
-    data = await res.json().catch(() => ({}));
-  } else if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    if (res.status === 413) {
-      const err = new Error(fileTooLargeMessage(0));
-      err.code = "file_too_large";
-      err.tips = FILE_TOO_LARGE_TIPS;
-      throw err;
-    }
-    throw new Error(text.slice(0, 200) || `Request failed (${res.status})`);
-  }
-
+  const data = await res.json().catch(() => ({}));
   if (!res.ok || data.success === false) {
-    if (res.status === 413 || data.error === "file_too_large") {
-      const err = new Error(data.message || fileTooLargeMessage(0));
-      err.code = "file_too_large";
-      err.tips = data.tips || FILE_TOO_LARGE_TIPS;
-      err.maxUploadMb = data.maxUploadMb || MAX_UPLOAD_MB;
-      throw err;
-    }
-    throw new Error(data.message || data.error || `Request failed (${res.status})`);
+    const raw = data.error || `Request failed (${res.status})`;
+    throw new Error(typeof toUserMessage === "function" ? toUserMessage(raw) : raw);
   }
   return data.data !== undefined ? data.data : data;
+}
+
+/** Long-running AI calls (paper generate, bulk OCR). Default 15 minutes. */
+async function apiFetchLong(path, options = {}, timeoutMs = 900000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(`${API_BASE}${path}`, { ...options, signal: controller.signal });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.success === false) {
+      const raw = data.error || `Request failed (${res.status})`;
+      throw new Error(typeof toUserMessage === "function" ? toUserMessage(raw) : raw);
+    }
+    return data.data !== undefined ? data.data : data;
+  } catch (e) {
+    if (e.name === "AbortError") {
+      throw new Error(
+        typeof toUserMessage === "function"
+          ? toUserMessage("timeout")
+          : "Request timed out — try fewer chapters or Weekly Test first."
+      );
+    }
+    if (typeof toUserMessage === "function" && e.message) {
+      throw new Error(toUserMessage(e));
+    }
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
 }

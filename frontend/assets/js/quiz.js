@@ -71,6 +71,7 @@ fileInput.onchange = async (e) => {
 
 /* ========= GENERATE QUIZ ========= */
 generateBtn.onclick = () => {
+  if (!requireModuleAccess("quiz", "Quiz Generator")) return;
   if (!inputText.value.trim()) {
     alert("Please add text first");
     return;
@@ -96,6 +97,7 @@ function startQuiz() {
         return;
       }
 
+      recordModuleUse("quiz");
       currentIndex = 0;
       score = 0;
       showQuestion();
@@ -193,21 +195,16 @@ function nextQuestion() {
   }
 }
 
-function refreshQuizHistory() {
-  if (typeof mountModuleHistory !== "function") return;
-  mountModuleHistory({
-    containerId: "moduleHistoryList",
-    module: "quiz",
-    onLoad(row) {
-      const qs = (row.result || {}).questions || [];
-      if (qs.length) {
-        quizQuestions = qs;
-        currentIndex = 0;
-        score = 0;
-        showQuestion();
-      }
-    },
-  });
+function loadQuizFromHistory(row) {
+  const qs = (row.result || {}).questions || [];
+  if (qs.length) {
+    quizQuestions = qs;
+    currentIndex = 0;
+    score = 0;
+    showQuestion();
+  }
 }
 
-refreshQuizHistory();
+function refreshQuizHistory() {}
+
+bootHistoryFromUrl((id) => `/api/records/${id}`, loadQuizFromHistory);

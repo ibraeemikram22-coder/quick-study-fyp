@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Smart Teacher Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Dashboard | Mukabbir College Gujrat</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -10,143 +11,252 @@
 
 <link rel="stylesheet" href="../../assets/css/home.css">
 <link rel="stylesheet" href="../../assets/css/module-ui.css">
+<link rel="stylesheet" href="../../assets/css/auth-portal.css">
 <link rel="stylesheet" href="../../assets/css/teacher.css">
 <link rel="stylesheet" href="../../assets/css/layout.css">
 </head>
 
-<body>
+<body data-skip-usage-banner="1">
 
 <div id="header"></div>
 
-<section class="page-header">
+<header class="td-hero">
   <div class="container">
-    <h1>Teacher <span>Dashboard</span></h1>
-    <p class="lead">Database Driven Paper Generator</p>
+    <div class="td-hero-inner">
+      <div>
+        <p class="td-badge"><i class="fas fa-graduation-cap me-1"></i> Punjab Board · Mukabbir College Gujrat</p>
+        <h1>Teacher Dashboard</h1>
+        <p class="td-lead">Create Punjab Board exam papers — select book, chapters, and exam type.</p>
+      </div>
+      <div class="td-hero-stat">
+        <span class="td-stat-label">Board</span>
+        <strong id="boardLabel">Punjab Board</strong>
+      </div>
+    </div>
   </div>
-</section>
+</header>
 
-<section class="py-5">
-<div class="container">
-
-<!-- CLASS -->
-<div class="dashboard-box">
-<h5>Class</h5>
-<select id="class" class="form-control">
-<option value="">Select Class</option>
-</select>
-</div>
-
-<!-- BOARD -->
-<div class="dashboard-box">
-<h5>Board</h5>
-<select id="board" class="form-control">
-<option value="">Select Board</option>
-</select>
-</div>
-
-<!-- EXAM TYPE -->
-<div class="dashboard-box">
-<h5>Exam Type</h5>
-<select id="exam" class="form-control">
-<option value="">Select Exam</option>
-</select>
-</div>
-
-<!-- SUBJECT -->
-<div class="dashboard-box">
-<h5>Subject</h5>
-<select id="subject" class="form-control">
-<option value="">Select Subject</option>
-</select>
-</div>
-
-<!-- BOOKS (DYNAMIC) -->
-<div class="dashboard-box">
-<h5>Books</h5>
-<div id="bookContainer">Select subject first</div>
-</div>
-
-<!-- CHAPTERS (DYNAMIC) -->
-<div class="dashboard-box">
-<h5>Chapters / Syllabus</h5>
-<button class="small-btn" onclick="selectAll()">Select All</button>
-<div id="chapterContainer"></div>
-</div>
-
-<!-- PATTERN -->
-<div class="dashboard-box">
-<h5>Paper Pattern</h5>
-<div id="patternBox" class="output-box"></div>
-</div>
-
-<!-- SETTINGS -->
-<div class="dashboard-box">
-<h5>Settings</h5>
-
-<input id="marks" class="form-control mb-2" value="100">
-<input id="time" class="form-control mb-2" value="3 Hours">
-
-<select id="difficulty" class="form-control">
-<option>Easy</option>
-<option>Medium</option>
-<option>Hard</option>
-<option>Mixed</option>
-</select>
-
-</div>
-
-<!-- GENERATE -->
-<div class="text-center">
-<button class="action-btn" onclick="generatePaper()">Generate Paper</button>
-</div>
-
-<!-- OUTPUT -->
-<div class="dashboard-box mt-4" id="outputBox" style="display:none;">
-<h5>Generated Paper</h5>
-<div class="output-box" id="output"></div>
-</div>
-
-</div>
-</section>
-
-<section class="module-guide-section">
+<main class="td-main">
   <div class="container">
-    <div class="module-guide">
-      <h5><i class="fas fa-circle-info me-2"></i>How to use Teacher Paper Generator</h5>
-      <p class="guide-lead">Build board-style exam papers from questions stored in the database.</p>
-      <div class="module-guide-steps guide-cols-2">
-        <div class="module-guide-step">
-          <span class="step-num">1</span>
-          <div>
-            <h6>Select filters</h6>
-            <p>Choose class, board, exam type, and subject. These must match what was set up in the Admin panel.</p>
+
+    <div id="teacherUserBar" class="module-role-bar" style="display:none" aria-live="polite"></div>
+
+    <div class="td-workflow-note alert alert-light border mb-4">
+      <strong>How it works:</strong>
+      <span class="text-muted">Admin uploads book PDF once.</span>
+      <span class="text-muted">You select class → book → exam → chapters → <strong>Create Paper</strong> (AI makes questions from book text — download Word / save).</span>
+    </div>
+
+    <ol class="td-stepper" id="stepper">
+      <li class="active" data-step="1"><span>1</span> Class</li>
+      <li data-step="2"><span>2</span> Subject / Book</li>
+      <li data-step="3"><span>3</span> Exam Type</li>
+      <li data-step="4"><span>4</span> Chapters</li>
+      <li data-step="5"><span>5</span> Create Paper</li>
+    </ol>
+
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="td-card" id="stepClass">
+          <div class="td-card-head">
+            <i class="fas fa-layer-group"></i>
+            <div>
+              <h2>Select Class</h2>
+              <p>Intermediate Part 1 or Part 2</p>
+            </div>
+          </div>
+          <div class="td-class-grid">
+            <button type="button" class="td-class-btn" data-level="11">
+              <strong>11th</strong>
+              <small>Intermediate Part 1</small>
+            </button>
+            <button type="button" class="td-class-btn" data-level="12">
+              <strong>12th</strong>
+              <small>Intermediate Part 2</small>
+            </button>
+          </div>
+          <input type="hidden" id="classId">
+          <input type="hidden" id="classLevel">
+          <input type="hidden" id="boardId">
+        </div>
+
+        <div class="td-card td-disabled" id="stepBook">
+          <div class="td-card-head">
+            <i class="fas fa-book"></i>
+            <div>
+              <h2>Select Subject &amp; Book</h2>
+              <p>Books uploaded by the administrator</p>
+            </div>
+          </div>
+          <label class="td-label" for="bookSelect">Available books</label>
+          <select id="bookSelect" class="form-select td-input" disabled>
+            <option value="">Select class first</option>
+          </select>
+          <p class="td-hint" id="bookHint">Only books uploaded in Admin appear here.</p>
+        </div>
+
+        <div class="td-card td-disabled" id="stepExam">
+          <div class="td-card-head">
+            <i class="fas fa-file-signature"></i>
+            <div>
+              <h2>Select Exam Type</h2>
+              <p>Punjab Board examination patterns</p>
+            </div>
+          </div>
+          <select id="exam" class="form-select td-input" disabled>
+            <option value="">Select class first</option>
+          </select>
+          <p class="td-hint" id="examInfo"></p>
+        </div>
+
+        <div class="td-card td-disabled" id="stepChapters">
+          <div class="td-card-head">
+            <i class="fas fa-list-check"></i>
+            <div>
+              <h2>Select Chapters</h2>
+              <p>Syllabus coverage for this paper</p>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mb-2">
+            <button type="button" class="btn btn-sm btn-outline-primary" id="btnSelectAll">Select All</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnClearChapters">Clear</button>
+          </div>
+          <div id="chapterContainer" class="syllabus-list">
+            <p class="text-muted small mb-0">Select a book to load chapters.</p>
+          </div>
+          <p class="td-hint" id="syllabusHint"></p>
+        </div>
+
+        <div class="td-card td-disabled" id="stepPattern">
+          <div class="td-card-head">
+            <i class="fas fa-table-list"></i>
+            <div>
+              <h2>Paper Pattern</h2>
+              <p id="patternSubtitle">Section-wise marks distribution</p>
+            </div>
+          </div>
+          <div id="patternBox"></div>
+
+          <div id="assessmentPanel" class="d-none">
+            <p class="td-label mt-3">Assessment format <span class="text-muted fw-normal">(choose one: A/B/C/D)</span></p>
+            <div class="td-assess-modes">
+              <label><input type="radio" name="assessMode" value="mcq" checked> A — MCQ only</label>
+              <label><input type="radio" name="assessMode" value="short"> B — Short only</label>
+              <label><input type="radio" name="assessMode" value="long"> C — Long only</label>
+              <label><input type="radio" name="assessMode" value="mixed"> D — Mixed</label>
+            </div>
+            <p class="small text-muted mb-1">Select a format above — counts update automatically. Section A/B/C tabs are hidden for Class Assessment.</p>
+            <div class="row g-2 mt-2" id="customCountsRow">
+              <div class="col-4"><label class="small">MCQs</label><input id="customMcq" type="number" class="form-control" value="10" min="0"></div>
+              <div class="col-4"><label class="small">Short</label><input id="customShort" type="number" class="form-control" value="0" min="0"></div>
+              <div class="col-4"><label class="small">Long</label><input id="customLong" type="number" class="form-control" value="0" min="0"></div>
+              <div class="col-6"><label class="small">Total marks</label><input id="customMarks" type="number" class="form-control" value="10"></div>
+              <div class="col-6"><label class="small">Time allowed</label><input id="customTime" class="form-control" value="30 minutes"></div>
+            </div>
+          </div>
+
+          <div class="paper-section-card mt-3" id="sectionsPanel">
+            <div class="paper-section-row">
+              <label><input type="checkbox" id="secAEnabled" checked> <strong>Section A</strong></label>
+              <input type="text" id="secATitle" class="form-control form-control-sm" value="SECTION A – MCQs">
+            </div>
+            <div class="row g-2">
+              <div class="col-6"><label class="small">Count</label><input type="number" id="secAMcq" class="form-control" value="6" min="0"></div>
+              <div class="col-6"><label class="small">Marks line</label><input type="text" id="secAMarks" class="form-control" value="6 × 1 = 6"></div>
+            </div>
+            <div class="paper-section-row mt-2">
+              <label><input type="checkbox" id="secBEnabled" checked> <strong>Section B</strong></label>
+              <input type="text" id="secBTitle" class="form-control form-control-sm" value="SECTION B – Short Questions">
+            </div>
+            <div class="row g-2">
+              <div class="col-6"><label class="small">Count</label><input type="number" id="secBShort" class="form-control" value="12" min="0"></div>
+              <div class="col-6"><label class="small">Marks line</label><input type="text" id="secBMarks" class="form-control" value="12 × 1 = 12"></div>
+            </div>
+            <div class="paper-section-row mt-2">
+              <label><input type="checkbox" id="secCEnabled" checked> <strong>Section C</strong></label>
+              <input type="text" id="secCTitle" class="form-control form-control-sm" value="SECTION C – Long Questions">
+            </div>
+            <div class="row g-2">
+              <div class="col-6"><label class="small">Count</label><input type="number" id="secCLong" class="form-control" value="1" min="0"></div>
+              <div class="col-6"><label class="small">Marks line</label><input type="text" id="secCMarks" class="form-control" value="1 × 12 = 12"></div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <label class="td-label" for="paperDate">Exam date</label>
+            <input type="date" id="paperDate" class="form-control td-input">
+          </div>
+          <div class="mt-2">
+            <label class="td-label" for="difficulty">Question difficulty</label>
+            <select id="difficulty" class="form-select td-input">
+              <option>Easy</option>
+              <option selected>Medium</option>
+              <option>Hard</option>
+              <option>Mixed</option>
+            </select>
+          </div>
+          <div class="mt-3">
+            <label class="d-flex gap-2 align-items-start small">
+              <input type="checkbox" id="preferCached" class="mt-1">
+              <span><strong>Reuse saved questions</strong> (same chapters may repeat — leave off for a fresh paper each time)</span>
+            </label>
+          </div>
+          <div class="mt-3">
+            <p class="td-label mb-1">Paper layout</p>
+            <div class="td-assess-modes">
+              <label><input type="radio" name="paperFormat" value="board" checked> Board format (table — like college preboard)</label>
+              <label><input type="radio" name="paperFormat" value="simple"> Without format (simple layout)</label>
+            </div>
+            <p class="small text-muted mb-0">Board format: Q1 MCQs (1,2,3…), Q2–Q4 short (i, ii, iii…), no reference column.</p>
           </div>
         </div>
-        <div class="module-guide-step">
-          <span class="step-num">2</span>
-          <div>
-            <h6>Pick book &amp; chapters</h6>
-            <p>Click a book, then tick the chapters you want on the paper. Use <strong>Select All</strong> for a full-book test.</p>
-          </div>
+
+        <div class="td-actions">
+          <button type="button" class="btn td-btn-primary" id="btnGenerate" disabled>
+            <i class="fas fa-wand-magic-sparkles me-1"></i> Create Paper
+          </button>
+          <button type="button" class="btn btn-outline-secondary" id="btnPrint" disabled>Print</button>
+          <button type="button" class="btn btn-outline-primary" id="btnDownload" disabled>Download Word</button>
+          <button type="button" class="btn btn-outline-success" id="btnSavePaper" disabled>Save Paper</button>
         </div>
-        <div class="module-guide-step">
-          <span class="step-num">3</span>
-          <div>
-            <h6>Check the pattern</h6>
-            <p>The paper pattern (MCQ / short / long counts, marks, time) loads automatically for your board and exam type.</p>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="td-preview-card">
+          <div class="td-preview-head">
+            <h2>Paper Preview</h2>
+            <span class="td-preview-badge" id="previewStatus">Configure options on the left</span>
           </div>
-        </div>
-        <div class="module-guide-step">
-          <span class="step-num">4</span>
-          <div>
-            <h6>Generate paper</h6>
-            <p>Click <strong>Generate Paper</strong>. Questions are picked randomly from the database. If you see “not enough questions,” add more in Admin.</p>
+          <div id="output" class="paper-preview td-preview-body">
+            <div class="td-preview-placeholder">
+              <i class="fas fa-file-lines"></i>
+              <p>Your generated examination paper will appear here.</p>
+              <small>MUKABBIR COLLEGE GUJRAT · Punjab Board format</small>
+            </div>
           </div>
         </div>
       </div>
-      <div class="module-guide-tip">
-        <i class="fas fa-lightbulb me-2"></i>
-        <strong>Tip:</strong> Chapters and questions are added in the Question Bank Admin panel. Student Generate Paper is separate — it builds papers from uploaded notes, not the database.
+    </div>
+  </div>
+</main>
+
+<section class="td-guide">
+  <div class="container">
+    <div class="td-guide-box">
+      <h3>Punjab Board paper structure (reference)</h3>
+      <div class="row g-3 small">
+        <div class="col-md-4">
+          <strong>Weekly / Monthly / Quarterly</strong>
+          <p class="mb-0">30 marks · 6 MCQs · 12 short · 1 long · 45 minutes</p>
+        </div>
+        <div class="col-md-4">
+          <strong>Half Book Exam</strong>
+          <p class="mb-0">Half syllabus · full board sections · 100 marks · 3 hours</p>
+        </div>
+        <div class="col-md-4">
+          <strong>Pre-Board Exam</strong>
+          <p class="mb-0">Complete syllabus · official board layout · 100 marks</p>
+        </div>
       </div>
     </div>
   </div>
@@ -155,7 +265,15 @@
 <div id="footer"></div>
 <script src="../../assets/js/header-footer.js"></script>
 <script src="../../assets/js/api-config.js"></script>
+<script src="../../assets/js/auth-sso.js"></script>
+<script src="../../assets/js/auth-session.js"></script>
+<script src="../../assets/js/auth-portal.js"></script>
+<script src="../../assets/js/friendly-errors.js"></script>
+<script src="../../assets/js/gemini-notice.js"></script>
+<script src="../../assets/js/paper-college-template.js"></script>
 <script src="../../assets/js/questionbank-teacher.js"></script>
-
+<script>
+  if (requireLogin(["teacher"])) mountDashboardRoleBar("teacherUserBar", "teacher");
+</script>
 </body>
 </html>

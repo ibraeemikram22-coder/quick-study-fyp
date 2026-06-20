@@ -21,52 +21,68 @@ const PROGRESS_STAGES = [
 ];
 
 const MCQ_LABELS = ["A", "B", "C", "D"];
+const MAX_UPLOAD_MB = 50;
+const MAX_PASTE_CHARS = 350000;
 
-function showUploadError(message, tips) {
-  const box = document.getElementById("uploadErrorBox");
-  const tipList = (tips || FILE_TOO_LARGE_TIPS)
-    .map((t) => `<li>${escapeHtml(t)}</li>`)
-    .join("");
-  box.innerHTML = `
-    <h6><i class="fas fa-exclamation-triangle me-1"></i>File upload nahi ho sakti</h6>
-    <p class="error-main mb-2">${escapeHtml(message)}</p>
-    <p class="small fw-semibold mb-1">Kya karein:</p>
-    <ul>${tipList}</ul>
-  `;
-  box.style.display = "block";
-  box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+function showStudentAlert(message, type = "error") {
+  const el = document.getElementById("studentAlert");
+  if (!el) return;
+  el.textContent = message;
+  el.className = `student-alert no-print is-${type}`;
+  el.style.display = "block";
 }
 
-function hideUploadError() {
-  const box = document.getElementById("uploadErrorBox");
-  if (box) {
-    box.style.display = "none";
-    box.innerHTML = "";
+function hideStudentAlert() {
+  const el = document.getElementById("studentAlert");
+  if (el) el.style.display = "none";
+}
+
+function validateUploadFile(file) {
+  if (!file) return true;
+  const mb = file.size / (1024 * 1024);
+  if (mb > MAX_UPLOAD_MB) {
+    showStudentAlert(
+      `File is too large (${mb.toFixed(1)} MB). Maximum allowed is ${MAX_UPLOAD_MB} MB. ` +
+        "Please compress the PDF, split the book into smaller parts, or paste only the chapter you need.",
+      "error"
+    );
+    return false;
   }
+  showStudentAlert(`Selected: ${file.name} (${mb.toFixed(1)} MB)`, "info");
+  return true;
 }
 
-function updateFileSizeHint(file) {
-  const hint = document.getElementById("fileSizeHint");
+function validatePastedText(text) {
+  if (!text || text.length <= MAX_PASTE_CHARS) return true;
+  showStudentAlert(
+    `Pasted text is too long (${text.length.toLocaleString()} characters). ` +
+      `Please upload a file or paste a smaller section (under ${MAX_PASTE_CHARS.toLocaleString()} characters).`,
+    "error"
+  );
+  return false;
+}
+
+document.getElementById("fileInput")?.addEventListener("change", (e) => {
+  const file = e.target.files[0];
   if (!file) {
-    hint.style.display = "none";
-    hint.className = "small text-muted mb-2";
+    hideStudentAlert();
     return;
   }
-  const tooLarge = file.size > MAX_UPLOAD_BYTES;
-  hint.style.display = "block";
-  hint.className = `small mb-2 ${tooLarge ? "file-too-large" : "file-ok"}`;
-  hint.textContent = tooLarge
-    ? `⚠ ${file.name} — ${formatFileSize(file.size)} (limit ${MAX_UPLOAD_MB} MB — file bara hai)`
-    : `✓ ${file.name} — ${formatFileSize(file.size)}`;
-  if (tooLarge) {
-    showUploadError(fileTooLargeMessage(file.size), FILE_TOO_LARGE_TIPS);
-  } else {
-    hideUploadError();
+  if (!validateUploadFile(file)) {
+    e.target.value = "";
   }
-}
+});
 
-document.getElementById("fileInput").addEventListener("change", (e) => {
-  updateFileSizeHint(e.target.files[0] || null);
+document.getElementById("textInput")?.addEventListener("input", (e) => {
+  const len = e.target.value.length;
+  if (len > MAX_PASTE_CHARS) {
+    showStudentAlert(
+      `Text is too long (${len.toLocaleString()} characters). Maximum is ${MAX_PASTE_CHARS.toLocaleString()} characters.`,
+      "warning"
+    );
+  } else if (len > 0 && !document.getElementById("fileInput").files[0]) {
+    hideStudentAlert();
+  }
 });
 
 document.querySelectorAll(".select-btn[data-type]").forEach((btn) => {
@@ -169,17 +185,27 @@ function resolveMcqLetter(correctAnswer, options) {
 
 function buildSourceLine(paper) {
   const info = paper?.sourceInfo;
-  if (!info) return "";
+  if (!info && paper?.generatedFrom !== "demo_fallback") return "";
   const parts = [];
-  if (info.pageCount) parts.push(`${info.pageCount.toLocaleString()} pages`);
-  if (info.totalCharacters) parts.push(`${info.totalCharacters.toLocaleString()} characters`);
-  else if (info.wordCount) parts.push(`${info.wordCount.toLocaleString()} words`);
-  const note =
-    info.coverageNote ||
-    (info.fullFileRead
+  if (info?.pageCount) parts.push(`${info.pageCount.toLocaleString()} pages`);
+  if (info?.totalCharacters) parts.push(`${info.totalCharacters.toLocaleString()} characters`);
+  else if (info?.wordCount) parts.push(`${info.wordCount.toLocaleString()} words`);
+  const demo =
+    paper?.generatedFrom === "demo_fallback" || info?.demoFallback;
+  let note =
+    info?.coverageNote ||
+    (info?.fullFileRead
       ? "Full document used — questions cover your whole notes."
-      : `Large file: ${info.sampleWindows || "several"} sections sampled (~${info.coveragePercent || "?"}%). Generate again for questions from other parts.`);
-  return `<p class="source-info small text-muted mb-3"><i class="fas fa-file-alt me-1"></i>${escapeHtml(parts.join(" · "))} — ${escapeHtml(note)}</p>`;
+      : info
+        ? `Large file: ${info.sampleWindows || "several"} sections sampled (~${info.coveragePercent || "?"}%). Generate again for questions from other parts.`
+        : "");
+  if (demo) {
+    note =
+      "Paper generated from your notes. Please try again later for full quality.";
+  }
+  const cls = demo ? "source-info small text-warning mb-3" : "source-info small text-muted mb-3";
+  const icon = demo ? "fa-triangle-exclamation" : "fa-file-alt";
+  return `<p class="${cls}"><i class="fas ${icon} me-1"></i>${escapeHtml(parts.join(" · "))}${parts.length ? " — " : ""}${escapeHtml(note)}</p>`;
 }
 
 function buildPaperTop(paper, showTime) {
@@ -525,9 +551,12 @@ async function generatePaper() {
   const counts = getCounts();
 
   if (!file && !text) {
-    alert("Upload PDF/DOCX/TXT or paste your notes.");
+    showStudentAlert("Upload PDF/DOCX/TXT or paste your notes.", "warning");
     return;
   }
+  if (file && !validateUploadFile(file)) return;
+  if (text && !validatePastedText(text)) return;
+  hideStudentAlert();
   if (selectedTypes.length === 0) {
     alert("Select at least one question type.");
     return;
@@ -536,12 +565,7 @@ async function generatePaper() {
     alert("Set count greater than 0 for selected types.");
     return;
   }
-  if (file && file.size > MAX_UPLOAD_BYTES) {
-    showUploadError(fileTooLargeMessage(file.size), FILE_TOO_LARGE_TIPS);
-    return;
-  }
 
-  hideUploadError();
   const btn = document.getElementById("generateBtn");
   btn.disabled = true;
   btn.textContent = paperMode === "test" ? "Preparing test..." : "Generating paper...";
@@ -591,19 +615,9 @@ async function generatePaper() {
 
     document.getElementById("paperWrap").scrollIntoView({ behavior: "smooth" });
   } catch (e) {
-    const isTooLarge =
-      e.code === "file_too_large" ||
-      e.message?.includes("413") ||
-      /too large|entity too large/i.test(e.message || "");
-    if (isTooLarge) {
-      const size = file ? file.size : 0;
-      showUploadError(
-        e.message && e.message !== "file_too_large" ? e.message : fileTooLargeMessage(size),
-        e.tips || FILE_TOO_LARGE_TIPS
-      );
-    } else {
-      alert(e.message || "Failed. Start backend: python app.py");
-    }
+    const msg = e.message || "Could not generate paper. Please try again.";
+    showStudentAlert(msg, "error");
+    if (typeof maybeShowGeminiError === "function") maybeShowGeminiError(e);
   } finally {
     hideProcessingOverlay();
     btn.disabled = false;
@@ -654,12 +668,49 @@ async function savePaper() {
         title: lastPaper.title,
         paper: lastPaper,
         filters: { source: "student", mode: paperMode },
+        userId: typeof getLoggedInUserId === "function" ? getLoggedInUserId() : null,
       }),
     });
     alert("Paper saved.");
+    refreshPaperHistory();
   } catch (e) {
-    alert(e.message);
+    alert(e.message || "Could not save paper.");
   }
+}
+
+function loadPaperFromHistory(row) {
+  const paper = row.paper;
+  if (!paper || !paper.sections) {
+    alert("This saved paper could not be loaded.");
+    return;
+  }
+  paperMode = row.filters?.mode || row.mode || "practice";
+  testSubmitted = false;
+  lastPaper = paper;
+  lastPaper._mode = paperMode;
+  document.getElementById("paperWrap").style.display = "block";
+  document.getElementById("toolbarBox").style.display = "block";
+  document.getElementById("scorePanel").style.display = "none";
+  stopTimer();
+  document.getElementById("timerBar").style.display = "none";
+  showPaper(paperMode);
+  if (paperMode === "test") {
+    document.getElementById("answerKeyArea").style.display = "none";
+    startTimer(computeTestMinutes(lastPaper._counts || getCounts()));
+  }
+  document.getElementById("paperWrap").scrollIntoView({ behavior: "smooth" });
+}
+
+function refreshPaperHistory() {
+  if (typeof mountModuleHistory !== "function") return;
+  mountModuleHistory({
+    containerId: "studentHistoryList",
+    module: "questionbank",
+    apiPath: "/api/questionbank/papers",
+    onLoad: loadPaperFromHistory,
+    limit: 6,
+    emptyText: "No saved papers yet. Generate a paper and click Save.",
+  });
 }
 
 document.getElementById("generateBtn").addEventListener("click", generatePaper);
@@ -675,3 +726,6 @@ document.getElementById("btnToggleKey").addEventListener("click", () => {
 });
 
 updateTimeEstimate();
+
+bootHistoryFromUrl((id) => `/api/questionbank/papers/${id}`, loadPaperFromHistory);
+refreshPaperHistory();

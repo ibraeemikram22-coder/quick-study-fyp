@@ -3,238 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quick Study Auth</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-<style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Poppins',sans-serif;
-}
-
-body{
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-
-  /*  LAVENDER BACKGROUND */
-  background: linear-gradient(135deg,#e6dbff,#f5f0ff,#ffffff);
-}
-
-/* MAIN CONTAINER */
-.container{
-  position:relative;
-  width:850px;
-  height:520px;
-  background:#fff;
-  border-radius:20px;
-  overflow:hidden;
-  box-shadow:0 15px 45px rgba(106,0,255,0.15);
-}
-
-/* FORMS */
-.form-box{
-  position:absolute;
-  width:50%;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  padding:40px;
-  transition:0.6s ease-in-out;
-  z-index:2; 
-}
-
-.login{ left:0; }
-.signup{ left:0; opacity:0; z-index:1; }
-
-.container.active .login{
-  transform:translateX(100%);
-  opacity:0;
-}
-
-.container.active .signup{
-  transform:translateX(100%);
-  opacity:1;
-  z-index:3;
-}
-
-/* INPUT */
-input{
-  width:100%;
-  padding:12px;
-  margin:10px 0;
-  border:none;
-  border-radius:8px;
-  background:#f3efff;
-}
-
-/* BUTTON */
-button{
-  margin-top:10px;
-  padding:12px 40px;
-  border:none;
-  border-radius:25px;
-  background:#b388ff;
-  color:white;
-  font-weight:600;
-  cursor:pointer;
-  transition:0.3s;
-}
-
-button:hover{
-  background:#9c6bff;
-}
-
-/* GOOGLE BUTTON */
-.google-btn{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  width:100%;
-  padding:12px;
-  border-radius:8px;
-  background:#fff;
-  border:1px solid #ddd;
-  cursor:pointer;
-  margin-top:10px;
-  transition:0.3s;
-  color:#333; /* 🔥 TEXT FIX */
-}
-
-.google-btn:hover{
-  background:#f7f5ff;
-  transform:translateY(-2px);
-}
-
-/* Divider */
-.divider{
-  width:100%;
-  text-align:center;
-  margin:15px 0;
-  font-size:13px;
-  color:#aaa;
-  position:relative;
-}
-.divider::before,
-.divider::after{
-  content:"";
-  position:absolute;
-  width:40%;
-  height:1px;
-  background:#ddd;
-  top:50%;
-}
-.divider::before{ left:0; }
-.divider::after{ right:0; }
-
-/* PANEL */
-.panel{
-  position:absolute;
-  width:50%;
-  height:100%;
-  right:0;
-  background:linear-gradient(135deg,#b388ff,#d1b3ff);
-  color:white;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:40px;
-  transition:0.6s ease-in-out;
-  z-index:1;
-}
-
-.container.active .panel{
-  transform:translateX(-100%);
-}
-
-/* SWITCH BUTTON */
-.switch-btn{
-  background:transparent;
-  border:2px solid white;
-}
-.switch-btn:hover{
-  background:white;
-  color:#b388ff;
-}
-
-/* TEXT */
-h2{ margin-bottom:10px; }
-p{ font-size:14px; margin-bottom:20px; }
-
-/* MOBILE */
-@media(max-width:768px){
-  .container{
-    width:95%;
-    height:560px;
-  }
-}
-</style>
+<title>Log in — Quick Study Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="assets/css/login.css">
+<link rel="stylesheet" href="assets/css/auth-portal.css">
 </head>
+<body class="login-page">
 
-<body>
+<div id="backendStatus" class="login-backend-status" aria-live="polite"></div>
 
-<div class="container" id="container">
+<div class="login-shell">
+  <header class="login-brand">
+    <h1 class="login-logo">Quick Study <span>Builder</span></h1>
+    <p class="login-tagline">Smart learning tools for students and teachers</p>
+  </header>
 
-  <!-- LOGIN -->
-  <div class="form-box login">
-    <h2>Login</h2>
+  <div class="login-card" id="userCard">
+    <h2 class="login-title" id="formTitle">Welcome back</h2>
+    <p class="login-sub" id="formSub">Sign in with your email to continue.</p>
 
-    <button type="button" class="google-btn" onclick="googleLogin()">
-      <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="18">
-      Continue with Google
-    </button>
+    <div class="login-mode-tabs" id="userModeTabs">
+      <button type="button" class="login-mode-btn active" id="tabLogin">Log in</button>
+      <button type="button" class="login-mode-btn" id="tabSignup">Sign up</button>
+    </div>
 
-    <div class="divider">or</div>
+    <form class="login-form" id="loginForm" onsubmit="return false;" autocomplete="off">
+      <div class="signup-fields" id="signupFields">
+        <label class="login-label" for="signupName">Full name</label>
+        <input type="text" id="signupName" class="login-input" placeholder="Your name" autocomplete="name">
 
-    <input type="email" id="loginEmail" placeholder="Email">
-    <input type="password" id="loginPassword" placeholder="Password">
-    <button type="button" onclick="handleLogin()">Login</button>
+        <div id="teacherSchoolWrap">
+          <label class="login-label" for="signupSchool">School / college</label>
+          <input type="text" id="signupSchool" class="login-input" placeholder="Institution name">
+        </div>
+      </div>
+
+      <label class="login-label" for="authEmail">Email</label>
+      <input type="email" id="authEmail" class="login-input" placeholder="Enter your email" autocomplete="off" spellcheck="false">
+
+      <label class="login-label" for="authPassword">Password</label>
+      <input type="password" id="authPassword" class="login-input" placeholder="Enter your password" autocomplete="new-password">
+
+      <button type="submit" class="login-submit" id="mainActionBtn">Log in</button>
+    </form>
+
+    <p id="authMsg" class="login-msg" role="status"></p>
   </div>
-
-  <!-- SIGNUP -->
-  <div class="form-box signup">
-    <h2>Sign Up</h2>
-
-    <button type="button" class="google-btn" onclick="googleLogin()">
-      <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="18">
-      Sign up with Google
-    </button>
-
-    <div class="divider">or</div>
-
-    <input type="text" id="signupName" placeholder="Name">
-    <input type="email" id="signupEmail" placeholder="Email">
-    <input type="password" id="signupPassword" placeholder="Password">
-    <select id="signupRole" class="form-select mt-2" style="width:100%;padding:12px;border-radius:8px;border:none;background:#f3efff">
-      <option value="student">Student</option>
-      <option value="teacher">Teacher</option>
-    </select>
-    <p style="font-size:12px;color:#666;margin-top:8px">Admin accounts are private — not available via signup.</p>
-    <button type="button" onclick="handleSignup()">Sign Up</button>
-    <p id="authMsg" style="font-size:13px;margin-top:10px;min-height:20px"></p>
-  </div>
-
-  <!-- PANEL -->
-  <div class="panel">
-    <h2 id="panelTitle">New here?</h2>
-    <p id="panelText">Create account to continue</p>
-    <button class="switch-btn" onclick="toggle()">Sign Up</button>
-  </div>
-
 </div>
 
+<script src="assets/js/friendly-errors.js"></script>
 <script src="assets/js/api-config.js"></script>
+<script src="assets/js/auth-sso.js"></script>
 <script src="assets/js/auth-session.js"></script>
+<script src="assets/js/auth-portal.js"></script>
 <script src="assets/js/login-page.js"></script>
-
 </body>
 </html>

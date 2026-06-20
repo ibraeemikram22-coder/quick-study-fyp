@@ -1,35 +1,28 @@
+from pathlib import Path
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-from werkzeug.exceptions import RequestEntityTooLarge
 import os
 
-load_dotenv()
+# Always load backend/.env (even if you run python from another folder)
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 app = Flask(__name__)
-# Student PDF uploads (large textbooks) — up to 80 MB
-UPLOAD_LIMIT_MB = int(os.getenv("MAX_UPLOAD_MB", "80"))
-app.config["MAX_CONTENT_LENGTH"] = UPLOAD_LIMIT_MB * 1024 * 1024
+# Textbook PDF uploads — up to 120 MB per file
+app.config["MAX_CONTENT_LENGTH"] = 120 * 1024 * 1024
 CORS(app)
 
 
-@app.errorhandler(RequestEntityTooLarge)
 @app.errorhandler(413)
 def request_entity_too_large(_exc):
+    limit_mb = app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)
     return jsonify(
         {
             "success": False,
-            "error": "file_too_large",
-            "message": (
-                f"File bahut bara hai — maximum {UPLOAD_LIMIT_MB} MB allowed hai. "
-                f"Your file exceeds the {UPLOAD_LIMIT_MB} MB upload limit."
+            "error": (
+                f"File too large (max {limit_mb} MB). Use a smaller or compressed PDF."
             ),
-            "maxUploadMb": UPLOAD_LIMIT_MB,
-            "tips": [
-                "PDF compress karein (ilovepdf.com / smallpdf.com)",
-                "Sirf 1–2 chapters upload karein, poori book ek sath nahi",
-                "Ya chapter ka text neeche paste karein",
-            ],
         }
     ), 413
 
@@ -55,9 +48,15 @@ app.register_blueprint(humanizer_bp, url_prefix="/humanizer")
 from modules.summarizer.routes import summarizer_bp
 app.register_blueprint(summarizer_bp)
 
-# Video transcript (YouTube + Whisper)
-from modules.transcript.routes import transcript_bp
-app.register_blueprint(transcript_bp, url_prefix="/transcript")
+# Video transcript (optional — heavy deps; paper/quiz modules work without it)
+TRANSCRIPT_ENABLED = False
+try:
+    from modules.transcript.routes import transcript_bp
+
+    app.register_blueprint(transcript_bp, url_prefix="/transcript")
+    TRANSCRIPT_ENABLED = True
+except ImportError as exc:
+    print(f"[WARN] Transcript module disabled: {exc}")
 
 # Auth (users in same SQLite database)
 from modules.auth_routes import auth_bp
@@ -70,6 +69,9 @@ from modules.questionbank.db import database_info, init_db
 from modules.questionbank.seed import run_seed
 
 init_db()
+from modules.auth_bootstrap import ensure_admin_user
+
+ensure_admin_user()
 run_seed()
 import_feedback_json_to_db()
 
@@ -105,14 +107,20 @@ def health():
             "quiz /quiz/generate",
             "humanizer /humanizer/humanize",
             "summarizer /api/notes/*",
-            "transcript /transcript/generate",
+            *(
+                ["transcript /transcript/generate"]
+                if TRANSCRIPT_ENABLED
+                else ["transcript (install yt-dlp + youtube-transcript-api)"]
+            ),
             "questionbank /api/questionbank/*",
             "auth /api/auth/*",
             "contact /api/contact/*",
             "history /api/history/*",
             "admin /api/admin/*",
         ],
+        "transcriptEnabled": TRANSCRIPT_ENABLED,
     }
 
 if __name__ == "__main__":
-    app.run(debug=True, port=3000)
+    debug_flag = os.getenv("FLASK_DEBUG", "false").strip().lower() in ("1", "true", "yes")
+    app.run(debug=debug_flag, port=3000)

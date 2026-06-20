@@ -8,10 +8,11 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/css/module-ui.css">
+<link rel="stylesheet" href="../../assets/css/auth-portal.css">
 <link rel="stylesheet" href="../../assets/css/vedio transcript.css">
 <link rel="stylesheet" href="../../assets/css/layout.css">
 </head>
-<body class="module-tool-page">
+<body class="module-tool-page" data-auth-module="transcript">
 <div id="header"></div>
 
 <section class="page-header">
@@ -23,6 +24,7 @@
 
 <section class="py-5">
   <div class="container">
+    <div id="usageBanner"></div>
     <div class="row g-4">
 
       <div class="col-lg-5">
@@ -55,13 +57,14 @@
             <input type="file" id="videoFile" accept="video/*,audio/*,.mp4,.webm,.mkv,.mov,.mp3,.wav,.m4a" hidden />
           </div>
 
-          <div id="status-alert" class="status-alert mt-3" role="status">Ready</div>
+          <div id="status-alert" class="status-alert mt-3" role="status"></div>
 
-          <div class="d-flex gap-2 mt-3 flex-wrap">
+          <div class="d-flex gap-2 mt-3 flex-wrap align-items-center">
             <button class="action-btn" id="generateBtn" type="button">
               <i class="fas fa-microphone me-2"></i>Generate Transcript
             </button>
             <button class="small-btn" id="clearBtn" type="button">Clear</button>
+            <a class="small-btn history-btn" href="../history/saved.html?module=transcript" target="_blank" rel="noopener">Saved</a>
           </div>
         </div>
       </div>
@@ -93,12 +96,6 @@
         </div>
       </div>
 
-    </div>
-
-    <div class="admin-card mt-4">
-      <h5 class="mb-2"><i class="fas fa-clock-rotate-left me-1"></i> Recent history (database)</h5>
-      <p class="small text-muted">Last transcripts are saved automatically. Admin can view all in Admin Panel → Transcripts.</p>
-      <div id="historyList"></div>
     </div>
 
   </div>
@@ -150,6 +147,12 @@
 <div id="footer"></div>
 <script src="../../assets/js/header-footer.js"></script>
 <script src="../../assets/js/api-config.js"></script>
+<script src="../../assets/js/friendly-errors.js"></script>
+<script src="../../assets/js/auth-sso.js"></script>
+<script src="../../assets/js/auth-session.js"></script>
+<script src="../../assets/js/auth-portal.js"></script>
+<script src="../../assets/js/usage-gate.js"></script>
+<script src="../../assets/js/module-history.js"></script>
 <script src="../../assets/js/transcript.js"></script>
 </body>
 </html>

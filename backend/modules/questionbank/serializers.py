@@ -25,13 +25,20 @@ def class_dict(row: SchoolClass):
     return {
         "id": row.id,
         "name": row.name,
+        "gradeLevel": row.grade_level,
         "boardId": row.board_id,
         "boardName": row.board.name if row.board else None,
     }
 
 
 def exam_dict(row: ExamType):
-    return {"id": row.id, "name": row.name, "code": row.code}
+    return {
+        "id": row.id,
+        "name": row.name,
+        "code": row.code,
+        "isEnabled": bool(row.is_enabled if row.is_enabled is not None else 1),
+        "sortOrder": row.sort_order or 0,
+    }
 
 
 def subject_dict(row: Subject):
@@ -44,17 +51,21 @@ def book_dict(row: Book):
         "name": row.name,
         "subjectId": row.subject_id,
         "subjectName": row.subject.name if row.subject else None,
+        "classLevel": row.class_level,
     }
 
 
-def chapter_dict(row: Chapter, include_content=False):
+def chapter_dict(row: Chapter, include_content=False, question_count=None):
+    if question_count is None:
+        question_count = len(row.questions) if row.questions is not None else 0
     data = {
         "id": row.id,
         "bookId": row.book_id,
         "title": row.title,
         "sortOrder": row.sort_order,
-        "questionCount": len(row.questions) if row.questions is not None else 0,
+        "questionCount": int(question_count or 0),
         "contentPreview": (row.content_text or "")[:120],
+        "charCount": len(row.content_text or ""),
     }
     if include_content:
         data["contentText"] = row.content_text or ""
@@ -71,6 +82,8 @@ def pattern_dict(row: PaperPattern):
         "mcqCount": row.mcq_count,
         "shortCount": row.short_count,
         "longCount": row.long_count,
+        "shortAttempt": row.short_attempt,
+        "longAttempt": row.long_attempt,
         "totalMarks": row.total_marks,
         "duration": row.duration,
     }

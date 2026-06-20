@@ -209,6 +209,12 @@ def _call_gemini(prompt, api_key, json_mode=True):
                 break
 
             if response.ok:
+                try:
+                    from modules.gemini_config import record_successful_request
+
+                    record_successful_request()
+                except Exception:
+                    pass
                 return _parse_gemini_response(response.json())
 
             status = response.status_code

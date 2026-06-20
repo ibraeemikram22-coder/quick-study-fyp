@@ -1,0 +1,31 @@
+# Python virtual environment (recreated by START_PROJECT.bat locally)
+backend/venv/
+backend/.deps_ok
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Secrets — NEVER push to GitHub
+backend/.env
+.env
+*.pem
+
+# Runtime data (created on server when users upload)
+backend/uploads/**/*
+!backend/uploads/books/.gitkeep
+backend/temp/**/*
+!backend/temp/.gitkeep
+backend/data/*.db
+
+# Logs
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Archives
+*.zip

@@ -21,6 +21,7 @@ aiInput.addEventListener("input", () => {
 });
 
 humanizeBtn.addEventListener("click", async () => {
+  if (!requireModuleAccess("humanizer", "AI Humanizer")) return;
   const text = aiInput.value.trim();
   const words = text.split(/\s+/).filter(Boolean).length;
 
@@ -53,13 +54,13 @@ humanizeBtn.addEventListener("click", async () => {
     document.getElementById("status-text").textContent = "Completed";
     const pct = document.getElementById("ai-percentage");
     if (pct) pct.textContent = "Status: Done";
-    setStatus(data.id ? `Humanized — saved #${data.id}` : "Humanized successfully", "success");
+    recordModuleUse("humanizer");
+    setStatus("Humanized successfully.", "success");
     refreshHumanizerHistory();
   } catch (err) {
     console.error(err);
-    setStatus("Cannot reach backend", "error");
-    outputBox.textContent =
-      "Failed to connect. Start backend: cd backend → python app.py (port 3000).";
+    setStatus("Connection problem — please try again.", "error");
+    outputBox.textContent = "Could not reach the server. Check your connection and try again.";
   }
 
   humanizeBtn.disabled = false;
@@ -83,19 +84,12 @@ clearBtn.addEventListener("click", () => {
   setStatus("Cleared", "success");
 });
 
-function refreshHumanizerHistory() {
-  if (typeof mountModuleHistory !== "function") return;
-  mountModuleHistory({
-    containerId: "moduleHistoryList",
-    module: "humanizer",
-    onLoad(row) {
-      const r = (row.result || {}).result;
-      if (r) {
-        outputBox.textContent = r;
-        setStatus(`Loaded history #${row.id}`, "success");
-      }
-    },
-  });
-}
+function refreshHumanizerHistory() {}
 
-refreshHumanizerHistory();
+bootHistoryFromUrl((id) => `/api/records/${id}`, (row) => {
+  const r = (row.result || {}).result;
+  if (r) {
+    outputBox.textContent = r;
+    setStatus("Loaded from your saved work.", "success");
+  }
+});

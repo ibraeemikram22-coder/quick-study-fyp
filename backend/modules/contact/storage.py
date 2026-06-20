@@ -135,4 +135,26 @@ def import_feedback_json_to_db():
 
 
 def get_contact_email():
-    return (os.getenv("CONTACT_EMAIL") or "quickstudybuilder@gmail.com").strip()
+    env = (os.getenv("CONTACT_EMAIL") or "").strip()
+    if env:
+        return env
+    try:
+        from modules.questionbank.db import SessionLocal, init_db
+        from modules.questionbank.models import User
+
+        init_db()
+        db = SessionLocal()
+        try:
+            admin = (
+                db.query(User)
+                .filter(User.role == "admin")
+                .order_by(User.id.asc())
+                .first()
+            )
+            if admin and admin.email:
+                return admin.email.strip()
+        finally:
+            db.close()
+    except Exception:
+        pass
+    return "admin@gmail.com"

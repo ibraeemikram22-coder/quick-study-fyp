@@ -28,6 +28,65 @@
   background: #32c9c4 !important;
   color: #fff !important;
 }
+
+/* Header profile chip + circular avatar */
+.user-avatar-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #b388ff, #7c4dff);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+.user-avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.user-avatar-circle.user-avatar-initial,
+.user-avatar-initial {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+#main-header .header-avatar-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+  margin: 0 4px 0 8px;
+  border: none !important;
+  border-bottom: none !important;
+  background: transparent !important;
+  text-decoration: none !important;
+  vertical-align: middle;
+  line-height: 0;
+}
+#main-header .header-avatar-btn:hover {
+  border-bottom: none !important;
+  transform: scale(1.06);
+}
+#main-header .header-avatar-btn .user-avatar-circle {
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+}
+.mobile-menu .header-avatar-btn {
+  display: inline-flex !important;
+  margin: 12px 0;
+  padding: 0 !important;
+  border-bottom: none !important;
+}
+.mobile-menu .header-avatar-btn .user-avatar-circle {
+  width: 44px;
+  height: 44px;
+}
 #main-header .logo .sub-text {
   color: #32c9c4 !important;
 }

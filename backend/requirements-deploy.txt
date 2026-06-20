@@ -1,0 +1,10 @@
+flask
+flask-cors
+python-dotenv
+requests
+sqlalchemy
+pymysql
+pypdf
+python-docx
+google-generativeai
+gunicorn

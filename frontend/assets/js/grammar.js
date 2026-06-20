@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ================= CHECK ================= */
     checkBtn.addEventListener("click", async () => {
+        if (!requireModuleAccess("grammar", "Grammar Check")) return;
 
         let text = input.value.trim();
 
@@ -63,25 +64,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         highlighted = false;
+        recordModuleUse("grammar");
         refreshGrammarHistory();
     });
 
-    function refreshGrammarHistory() {
-        if (typeof mountModuleHistory !== "function") return;
-        mountModuleHistory({
-            containerId: "moduleHistoryList",
-            module: "grammar",
-            onLoad(row) {
-                const r = row.result || {};
-                if (r.corrected) {
-                    input.value = r.original || "";
-                    output.innerText = r.corrected;
-                    percent.innerText = "Errors: " + (r.error_count || 0);
-                }
-            },
-        });
-    }
-    refreshGrammarHistory();
+    function refreshGrammarHistory() {}
+
+    bootHistoryFromUrl((id) => `/api/records/${id}`, (row) => {
+        const r = row.result || {};
+        if (r.corrected) {
+            input.value = r.original || "";
+            output.innerText = r.corrected;
+            percent.innerText = "Errors: " + (r.error_count || 0);
+        }
+    });
 
     /* ================= COPY ================= */
     copyBtn.addEventListener("click", () => {

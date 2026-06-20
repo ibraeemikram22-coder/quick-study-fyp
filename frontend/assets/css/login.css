@@ -1,0 +1,215 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body.login-page {
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(145deg, #ebe3ff 0%, #f8f5ff 40%, #ffffff 100%);
+  font-family: "Poppins", sans-serif;
+  color: #1d1d1f;
+}
+
+.login-shell {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-logo {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #4a3278;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.login-logo span {
+  color: #32c9c4;
+}
+
+.login-tagline {
+  color: #666;
+  font-size: 0.92rem;
+  margin: 0.4rem 0 0;
+}
+
+.login-card {
+  background: #ffffff;
+  border: 1px solid #e8e0f5;
+  border-radius: 20px;
+  padding: 1.75rem 1.5rem 1.5rem;
+  box-shadow: 0 12px 40px rgba(107, 76, 154, 0.12);
+}
+
+.login-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #4a3278;
+  margin: 0 0 0.25rem;
+}
+
+.login-sub {
+  font-size: 0.88rem;
+  color: #666;
+  margin: 0 0 1.15rem;
+  line-height: 1.45;
+}
+
+.login-mode-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.15rem;
+  background: #f3effa;
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.login-mode-btn {
+  flex: 1;
+  padding: 0.55rem 0.5rem;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  color: #6b4c9a;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.login-mode-btn.active {
+  background: #ffffff;
+  color: #4a3278;
+  box-shadow: 0 2px 8px rgba(107, 76, 154, 0.12);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+.login-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #5a3d88;
+  margin: 0.65rem 0 0.35rem;
+}
+
+.login-form .login-label:first-child,
+.signup-fields.visible .login-label:first-child {
+  margin-top: 0;
+}
+
+.login-input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  padding: 0.75rem 0.9rem;
+  border: 1.5px solid #e0d4f5;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  background: #faf9fc;
+  color: #1d1d1f;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #32c9c4;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(50, 201, 196, 0.18);
+}
+
+.login-submit {
+  width: 100%;
+  margin-top: 1.15rem;
+  padding: 0.8rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6b4c9a, #7d5cb0);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: filter 0.15s, transform 0.1s;
+}
+
+.login-submit:hover {
+  filter: brightness(1.06);
+}
+
+.login-submit:active {
+  transform: scale(0.99);
+}
+
+.login-msg {
+  min-height: 1.25rem;
+  font-size: 0.85rem;
+  text-align: center;
+  margin: 0.85rem 0 0;
+  line-height: 1.4;
+}
+
+.signup-fields {
+  display: none;
+}
+
+.signup-fields.visible {
+  display: block;
+}
+
+#teacherSchoolWrap {
+  display: none;
+}
+
+#teacherSchoolWrap.visible {
+  display: block;
+}
+
+.login-backend-status {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  z-index: 20;
+}
+
+.login-backend-status.is-online {
+  background: #e8f8f0;
+  color: #1e8449;
+}
+
+.login-backend-status.is-offline {
+  background: #fdecea;
+  color: #c0392b;
+}
+
+@media (max-width: 400px) {
+  .login-card {
+    padding: 1.35rem 1.1rem 1.2rem;
+  }
+
+  .login-logo {
+    font-size: 1.55rem;
+  }
+}

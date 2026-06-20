@@ -1,8 +1,6 @@
-import os
-import smtplib
-from email.mime.text import MIMEText
-
 from flask import Blueprint, jsonify, request
+
+from modules.email_util import send_email
 
 from .storage import get_contact_email, load_feedback, save_feedback_entry
 
@@ -22,29 +20,12 @@ def _err(message, code=400):
 
 
 def _try_send_email(name, email, subject, message):
-    smtp_host = (os.getenv("SMTP_HOST") or "").strip()
-    smtp_user = (os.getenv("SMTP_USER") or "").strip()
-    smtp_pass = (os.getenv("SMTP_PASSWORD") or "").strip()
     to_addr = get_contact_email()
-    if not smtp_host or not smtp_user or not smtp_pass:
-        return False
-
     body = (
         f"New message — Quick Study Builder\n\n"
         f"Name: {name}\nEmail: {email}\nSubject: {subject}\n\n{message}\n"
     )
-    msg = MIMEText(body, "plain", "utf-8")
-    msg["Subject"] = f"[Quick Study] {subject}"
-    msg["From"] = smtp_user
-    msg["To"] = to_addr
-    msg["Reply-To"] = email
-
-    port = int(os.getenv("SMTP_PORT") or 587)
-    with smtplib.SMTP(smtp_host, port, timeout=15) as server:
-        server.starttls()
-        server.login(smtp_user, smtp_pass)
-        server.sendmail(smtp_user, [to_addr], msg.as_string())
-    return True
+    return send_email(to_addr, f"[Quick Study] {subject}", body)
 
 
 @contact_bp.route("/api/contact/info", methods=["GET"])

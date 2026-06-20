@@ -1,28 +1,90 @@
+@import url("admin-theme.css");
+
 :root {
-  --qb-primary: #6b4c9a;
-  --qb-accent: #32c9c4;
-  --qb-bg: #f7f4ff;
+  --qb-primary: var(--admin-purple-deep);
+  --qb-accent: var(--admin-teal);
+  --qb-bg: var(--admin-bg);
 }
 
-body {
+body.qb-admin-shell {
   background: var(--qb-bg);
+  padding-top: 0;
+  font-family: "Poppins", sans-serif;
+  color: var(--admin-text);
+}
+
+.qb-admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1.5rem;
+  background: linear-gradient(90deg, var(--admin-purple-deep), var(--admin-purple-dark));
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(74, 50, 120, 0.25);
+}
+
+.qb-admin-topbar a {
+  color: var(--admin-teal);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.qb-admin-topbar a:hover {
+  color: var(--admin-gold);
+}
+
+.qb-admin-topbar-title {
+  font-weight: 700;
+  font-size: 1.05rem;
 }
 
 .admin-hero {
-  padding: 50px 0 30px;
-  background: linear-gradient(135deg, #ede4ff, #fff);
-  text-align: center;
+  padding: 2rem 0 1.5rem;
+  background: linear-gradient(135deg, #f0e8ff 0%, #fff 55%, #e8faf9 100%);
+  border-bottom: 1px solid var(--admin-card-border);
+}
+
+.admin-hero h1 .text-primary {
+  color: var(--admin-purple-deep) !important;
 }
 
 .quick-start {
-  border-left: 4px solid var(--qb-primary);
+  border-left: 4px solid var(--admin-teal);
   background: #fff;
+}
+
+.qb-admin-shell .btn-primary {
+  background: var(--qb-primary);
+  border-color: var(--qb-primary);
+}
+
+.qb-admin-shell .btn-primary:hover {
+  background: var(--admin-purple);
+  border-color: var(--admin-purple);
+}
+
+.qb-admin-shell .btn-outline-secondary {
+  border-color: var(--admin-card-border);
+  color: var(--admin-purple-deep);
 }
 
 /* admin-card styled in module-ui.css */
 
+.nav-pills .nav-link {
+  color: var(--admin-purple-deep);
+  font-weight: 600;
+}
+
 .nav-pills .nav-link.active {
   background: var(--qb-primary);
+  color: #fff;
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+  background: rgba(107, 76, 154, 0.1);
 }
 
 .json-preview {
@@ -34,6 +96,120 @@ body {
   overflow: auto;
   font-size: 13px;
   white-space: pre-wrap;
+}
+
+.book-upload-card {
+  background: #fff;
+  border: 2px solid #e8e0f5;
+  border-radius: 12px;
+  padding: 14px;
+  height: 100%;
+}
+.book-upload-card.uploaded {
+  border-color: #28a745;
+  background: #f6fff8;
+}
+.book-upload-card .book-title {
+  font-weight: 700;
+  font-size: 15px;
+}
+.book-upload-card .book-subject {
+  font-size: 12px;
+  color: #666;
+}
+.input-clear-wrap {
+  position: relative;
+  display: block;
+}
+.input-clear-wrap .form-control,
+.input-clear-wrap .form-select,
+.input-clear-wrap textarea {
+  padding-right: 36px;
+}
+.input-clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: #eee;
+  color: #666;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+}
+.input-clear-wrap textarea + .input-clear-btn {
+  top: 12px;
+  transform: none;
+}
+.input-clear-btn:hover {
+  background: #e74c3c;
+  color: #fff;
+}
+.pattern-sections-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.pattern-sec-box {
+  background: #f8f5ff;
+  border: 1px solid #e0d4f5;
+  border-radius: 10px;
+  padding: 10px;
+}
+.pattern-sec-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--qb-primary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.admin-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+}
+.admin-list-row span {
+  flex: 1;
+}
+.admin-remove-btn {
+  font-size: 11px;
+  padding: 2px 8px;
+  flex-shrink: 0;
+}
+.admin-tab-help {
+  background: #fff;
+  border: 1px solid #e8e0f5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  line-height: 1.6;
+}
+@media (max-width: 576px) {
+  .pattern-sections-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.book-upload-card .book-status {
+  font-size: 12px;
+  margin: 8px 0;
+  min-height: 36px;
+}
+.book-upload-card .book-status.ok {
+  color: #198754;
+}
+.book-upload-card .book-status.empty {
+  color: #999;
 }
 
 .status-bar {
@@ -48,4 +224,110 @@ body {
 
 .status-bar.ok {
   color: #1e8449;
+}
+
+.chapter-mini-table {
+  font-size: 0.88rem;
+}
+
+.chapter-mini-table th {
+  background: #f8f5ff;
+  font-weight: 600;
+}
+
+.chapter-status-table {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.admin-upload-bar {
+  position: sticky;
+  top: 70px;
+  z-index: 11;
+  margin-bottom: 16px;
+}
+
+.admin-upload-bar-inner {
+  background: linear-gradient(135deg, var(--admin-purple-dark), var(--admin-purple-deep));
+  color: #fff;
+  padding: 16px 18px;
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(107, 76, 154, 0.4);
+}
+
+.admin-upload-bar.is-error .admin-upload-bar-inner {
+  background: linear-gradient(135deg, #7b2d26, #c0392b);
+}
+
+.admin-upload-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.admin-upload-title {
+  flex: 1;
+}
+
+.admin-upload-percent {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.1rem;
+  min-width: 44px;
+  text-align: right;
+}
+
+.admin-upload-bar .progress-track {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.admin-upload-bar .progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #32c9c4, #7ee8e4);
+  transition: width 0.6s ease;
+  box-shadow: 0 0 12px rgba(50, 201, 196, 0.6);
+}
+
+.admin-upload-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-upload-step {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.92;
+  flex: 1;
+}
+
+.admin-upload-timer {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.admin-upload-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: admin-upload-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes admin-upload-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -37,7 +37,7 @@ document.querySelectorAll(".mode-tab").forEach((tab) => {
     tab.classList.add("active");
     panelLink.classList.toggle("d-none", currentMode !== "link");
     panelUpload.classList.toggle("d-none", currentMode !== "upload");
-    setStatus("Ready", "");
+    setStatus("", "");
   });
 });
 
@@ -64,8 +64,8 @@ function setOutput(text, state) {
 function sourceLabelText(source) {
   const map = {
     youtube_captions: "YouTube subtitles",
-    gemini: "AI (Gemini)",
-    whisper: "AI (Whisper)",
+    gemini: "AI transcription",
+    whisper: "AI transcription",
   };
   return map[source] || source || "—";
 }
@@ -100,6 +100,7 @@ if (dropArea && videoFile) {
 }
 
 generateBtn.onclick = async () => {
+  if (!requireModuleAccess("transcript", "Video Transcript")) return;
   generateBtn.disabled = true;
   setMeta("Processing", "loading");
   setStatus("Generating transcript… this may take 1–2 minutes.", "loading");
@@ -152,6 +153,7 @@ generateBtn.onclick = async () => {
       return;
     }
 
+    recordModuleUse("transcript");
     const text = data.transcript || "";
     setOutput(text, "success-state");
     const savedNote = data.id ? ` Saved to history (#${data.id}).` : "";
@@ -159,12 +161,12 @@ generateBtn.onclick = async () => {
     setMeta("Done", "done");
     wordCountEl.textContent = data.wordCount || text.split(/\s+/).filter(Boolean).length;
     sourceLabel.textContent = sourceLabelText(data.source);
-    loadRecentHistory();
+    refreshTranscriptHistory();
   } catch (err) {
     console.error(err);
-    setStatus("Cannot reach backend. Run: cd backend → python app.py", "error");
+    setStatus("Connection problem — please try again.", "error");
     setMeta("Offline", "error");
-    setOutput("Failed to connect to server on port 3000.", "error-state");
+    setOutput("Could not reach the server. Check your connection and try again.", "error-state");
   } finally {
     generateBtn.disabled = false;
   }
@@ -176,7 +178,7 @@ document.getElementById("clearBtn").onclick = () => {
   videoFile.value = "";
   fileNameEl.textContent = "No file selected";
   setOutput("Your transcript will appear here...", "");
-  setStatus("Ready", "");
+  setStatus("", "");
   setMeta("Waiting", "");
   wordCountEl.textContent = "0";
   sourceLabel.textContent = "—";
@@ -197,42 +199,11 @@ downloadBtn.onclick = () => {
   a.click();
 };
 
-async function loadRecentHistory() {
-  const box = document.getElementById("historyList");
-  if (!box) return;
-  try {
-    const uid = getLoggedInUserId();
-    const q = uid ? `?limit=5&userId=${uid}` : "?limit=5";
-    const res = await fetch(`${API_BASE}/transcript/history${q}`);
-    const data = await res.json();
-    const items = data.items || [];
-    if (!items.length) {
-      box.innerHTML = '<p class="small text-muted mb-0">No saved transcripts yet.</p>';
-      return;
-    }
-    box.innerHTML = items
-      .map(
-        (t) => `
-      <button type="button" class="btn btn-sm btn-outline-secondary me-1 mb-1 history-pick" data-id="${t.id}">
-        #${t.id} · ${(t.sourceLabel || "").slice(0, 30)}…
-      </button>`
-      )
-      .join("");
-    box.querySelectorAll(".history-pick").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const r = await fetch(`${API_BASE}/transcript/history/${btn.dataset.id}`);
-        const d = await r.json();
-        if (d.success && d.data) {
-          setOutput(d.data.transcript, "success-state");
-          wordCountEl.textContent = d.data.wordCount;
-          sourceLabel.textContent = sourceLabelText(d.data.sourceEngine);
-          setStatus(`Loaded transcript #${d.data.id} from history.`, "success");
-        }
-      });
-    });
-  } catch {
-    box.innerHTML = '<p class="small text-muted mb-0">History unavailable.</p>';
-  }
-}
+function refreshTranscriptHistory() {}
 
-loadRecentHistory();
+bootHistoryFromUrl((id) => `/transcript/history/${id}`, (row) => {
+  setOutput(row.transcript || "", "success-state");
+  wordCountEl.textContent = row.wordCount || 0;
+  sourceLabel.textContent = sourceLabelText(row.sourceEngine);
+  setStatus("Loaded from your saved transcripts.", "success");
+});

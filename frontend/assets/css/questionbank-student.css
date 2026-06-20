@@ -1,41 +1,5 @@
 /* Student Self-Test — formal exam paper (not quiz-style) */
 
-.upload-error-box {
-  background: #fff5f5;
-  border: 2px solid #e57373;
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  color: #922b21;
-}
-
-.upload-error-box h6 {
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #c0392b;
-}
-
-.upload-error-box ul {
-  margin: 0;
-  padding-left: 1.2rem;
-  font-size: 13px;
-}
-
-.upload-error-box .error-main {
-  font-size: 14px;
-  margin-bottom: 8px;
-  line-height: 1.5;
-}
-
-#fileSizeHint.file-ok {
-  color: #1b6b4a;
-}
-
-#fileSizeHint.file-too-large {
-  color: #c0392b;
-  font-weight: 600;
-}
-
 .mode-card {
   border: 2px solid #e8dff5;
   border-radius: 14px;
@@ -54,6 +18,32 @@
 .mode-card h6 {
   font-weight: 700;
   margin-bottom: 6px;
+}
+
+.student-alert {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.student-alert.is-error {
+  background: #fff0f0;
+  border: 1px solid #e57373;
+  color: #922b21;
+}
+
+.student-alert.is-warning {
+  background: #fff8e6;
+  border: 1px solid #f0c36d;
+  color: #8a5a00;
+}
+
+.student-alert.is-info {
+  background: #f0ebfa;
+  border: 1px solid #c9b8e8;
+  color: #5b3d8a;
 }
 
 .paper-simple-header h3 {

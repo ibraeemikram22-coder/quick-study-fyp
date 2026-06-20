@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — Quick Study Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="./assets/css/layout.css">
+<link rel="stylesheet" href="./assets/css/module-ui.css">
+<link rel="stylesheet" href="./assets/css/auth-portal.css">
+<link rel="stylesheet" href="./assets/css/profile.css">
+</head>
+<body class="profile-page-body">
+
+<div id="header"></div>
+
+<section class="profile-cover">
+  <div class="profile-cover-inner"></div>
+</section>
+
+<section class="profile-main">
+  <div class="container">
+    <p class="profile-back-home"><a href="index.html"><i class="fas fa-arrow-left me-1"></i> Back to Home</a></p>
+    <div class="profile-top-card">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar-lg" id="profileAvatarBox"></div>
+        <label class="profile-avatar-edit" for="avatarInput" title="Change photo">
+          <i class="fas fa-camera"></i>
+        </label>
+        <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+      </div>
+      <div class="profile-top-info">
+        <h1 id="profileNameDisplay">Loading…</h1>
+        <p class="profile-email-line" id="profileEmail"></p>
+        <span class="profile-role-badge" id="profileRole">Member</span>
+      </div>
+      <button type="button" class="profile-logout-btn" id="profileLogout">
+        <i class="fas fa-right-from-bracket me-1"></i> Logout
+      </button>
+    </div>
+
+    <div class="profile-grid">
+      <div class="profile-panel">
+        <h2><i class="fas fa-user-pen me-2"></i>Edit profile</h2>
+        <p class="panel-hint">Update your display name. Email cannot be changed.</p>
+        <label class="field-label">Display name</label>
+        <input type="text" id="editName" class="profile-input" placeholder="Your name" maxlength="80">
+        <label class="field-label">Email</label>
+        <input type="email" id="editEmail" class="profile-input profile-input-readonly" readonly>
+        <p id="profileSaveMsg" class="profile-save-msg"></p>
+        <button type="button" class="profile-save-btn" id="saveProfileBtn">
+          <i class="fas fa-check me-1"></i> Save changes
+        </button>
+        <button type="button" class="profile-remove-photo-btn" id="removePhotoBtn" type="button">Remove photo</button>
+      </div>
+
+      <div class="profile-panel">
+        <h2><i class="fas fa-wand-magic-sparkles me-2"></i>Your tools</h2>
+        <p class="panel-hint">Unlimited access while logged in.</p>
+        <div class="profile-links" id="profileLinks"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer"></div>
+
+<script src="./assets/js/friendly-errors.js"></script>
+<script src="./assets/js/api-config.js"></script>
+<script src="./assets/js/auth-sso.js"></script>
+<script src="./assets/js/auth-session.js"></script>
+<script src="./assets/js/auth-portal.js"></script>
+<script src="./assets/js/header-footer.js"></script>
+<script src="./assets/js/profile-page.js"></script>
+</body>
+</html>

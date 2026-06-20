@@ -3,10 +3,10 @@ async function loadContactEmail() {
   if (!el) return;
   try {
     const info = await apiFetch("/api/contact/info");
-    const email = info.contactEmail || "quickstudybuilder@gmail.com";
+    const email = info.contactEmail || "admin@gmail.com";
     el.innerHTML = `<a href="mailto:${email}">${email}</a>`;
   } catch {
-    el.textContent = "quickstudybuilder@gmail.com";
+    el.textContent = "admin@gmail.com";
   }
 }
 

@@ -1,9 +1,490 @@
-/* Teacher dashboard — shared boxes in module-ui.css */
+/* Teacher Dashboard — matches Quick Study Builder theme */
 
-.paper-preview {
-  background: #fff;
+:root {
+  --td-primary: var(--dark, #b081d2);
+  --td-accent: var(--secondary, #32c9c4);
+  --td-gold: var(--primary, #ffeb3a);
+  --td-bg: var(--light, #f5f5f5);
+  --td-card: var(--white, #fff);
+  --td-border: #e8dff8;
+  --td-muted: var(--subtext, #555);
+  --td-text: var(--text, #1d1d1f);
+}
+
+body {
+  background: var(--td-bg);
+  font-family: "Poppins", sans-serif;
+}
+
+.td-hero {
+  background: linear-gradient(135deg, #9a6fc4 0%, var(--td-primary) 40%, var(--td-accent) 100%);
+  color: #fff;
+  padding: 2.5rem 0 2rem;
+}
+.td-hero-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.td-hero h1 {
+  font-weight: 900;
+  font-size: 2rem;
+  margin: 0.25rem 0;
+}
+.td-lead {
+  opacity: 0.92;
+  margin: 0;
+  max-width: 520px;
+}
+.td-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  margin: 0;
+}
+.td-hero-stat {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  text-align: center;
+}
+.td-stat-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.td-main {
+  padding: 1.5rem 0 3rem;
+  margin-top: -1rem;
+}
+
+.td-stepper {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+.td-stepper li {
+  flex: 1;
+  min-width: 90px;
+  background: var(--td-card);
+  border: 1px solid var(--td-border);
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.72rem;
+  color: var(--td-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: var(--shadow, 0 2px 8px rgba(0, 0, 0, 0.06));
+}
+.td-stepper li span {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #eee;
+  color: var(--td-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+.td-stepper li.active {
+  border-color: var(--td-accent);
+  color: var(--td-primary);
+  font-weight: 700;
+}
+.td-stepper li.active span,
+.td-stepper li.done span {
+  background: var(--td-gold);
+  color: var(--td-text);
+}
+
+.td-card {
+  background: var(--td-card);
+  border: 1px solid var(--td-border);
   border-radius: 14px;
-  padding: 20px;
-  border: 2px dashed var(--ui-secondary, #32c9c4);
-  min-height: 200px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow, 0 4px 15px rgba(119, 101, 101, 0.12));
+  transition: opacity 0.2s;
+}
+.td-card.td-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.td-card-head {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+}
+.td-card-head i {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #f3e8ff, #e0f7f6);
+  color: var(--td-primary);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+.td-card-head h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--td-primary);
+}
+.td-card-head p {
+  font-size: 0.8rem;
+  color: var(--td-muted);
+  margin: 0.15rem 0 0;
+}
+.td-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--td-primary);
+  margin-bottom: 0.35rem;
+  display: block;
+}
+.td-input {
+  border-radius: 8px;
+  border-color: var(--td-border);
+}
+.td-input:focus {
+  border-color: var(--td-accent);
+  box-shadow: 0 0 0 0.15rem rgba(50, 201, 196, 0.2);
+}
+.td-hint {
+  font-size: 0.78rem;
+  color: var(--td-muted);
+  margin: 0.5rem 0 0;
+}
+
+.td-class-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.td-class-btn {
+  border: 2px solid var(--td-border);
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.td-class-btn strong {
+  display: block;
+  font-size: 1.25rem;
+  color: var(--td-primary);
+}
+.td-class-btn small {
+  color: var(--td-muted);
+}
+.td-class-btn:hover,
+.td-class-btn.selected {
+  border-color: var(--td-accent);
+  background: linear-gradient(135deg, #fffef5, #f0fffe);
+  box-shadow: 0 0 0 2px var(--td-gold);
+}
+
+.td-assess-modes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+.td-assess-modes label {
+  cursor: pointer;
+  margin: 0;
+}
+
+.td-pattern-table th {
+  font-size: 0.75rem;
+  background: var(--td-bg);
+  color: var(--td-primary);
+}
+
+.paper-section-card {
+  background: var(--td-bg);
+  border: 1px solid var(--td-border);
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+.paper-section-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+.paper-section-row label {
+  margin: 0;
+  min-width: 100px;
+  font-size: 0.85rem;
+  color: var(--td-primary);
+}
+.paper-section-row .form-control-sm {
+  flex: 1;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.syllabus-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 8px;
+  background: var(--td-bg);
+  border-radius: 8px;
+  border: 1px solid var(--td-border);
+}
+.syllabus-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid var(--td-border);
+  cursor: pointer;
+  margin: 0;
+  font-size: 0.85rem;
+}
+.syllabus-item:has(input:checked) {
+  border-color: var(--td-accent);
+  background: #f0fffe;
+}
+
+.td-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.td-btn-primary {
+  background: var(--td-primary) !important;
+  color: #fff !important;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 700;
+}
+.td-btn-primary:hover {
+  background: var(--td-accent) !important;
+  color: var(--td-text) !important;
+}
+.td-btn-primary:disabled {
+  opacity: 0.5;
+}
+
+.td-preview-card {
+  background: var(--td-card);
+  border: 1px solid var(--td-border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow, 0 4px 15px rgba(119, 101, 101, 0.15));
+  position: sticky;
+  top: 5rem;
+}
+.td-preview-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--td-border);
+  background: linear-gradient(90deg, #f9f5ff, #f0fffe);
+}
+.td-preview-head h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--td-primary);
+}
+.td-preview-badge {
+  font-size: 0.72rem;
+  background: var(--td-gold);
+  color: var(--td-text);
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.td-preview-body {
+  min-height: 480px;
+  max-height: 75vh;
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+.td-preview-placeholder {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--td-muted);
+}
+.td-preview-placeholder i {
+  font-size: 2.5rem;
+  color: var(--td-primary);
+  opacity: 0.4;
+  margin-bottom: 1rem;
+}
+
+.td-guide {
+  padding: 0 0 3rem;
+}
+.td-guide-box {
+  background: #fff;
+  border: 1px solid var(--td-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow, 0 2px 10px rgba(0, 0, 0, 0.06));
+}
+.td-guide-box h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--td-primary);
+  margin-bottom: 1rem;
+}
+
+.paper-preview .college-paper {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 13px;
+  color: #111;
+}
+.paper-preview .paper-college-name {
+  text-align: center;
+  font-weight: bold;
+  font-size: 17px;
+}
+.paper-preview .paper-board-line {
+  text-align: center;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+.paper-preview .paper-exam-title {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.paper-preview .paper-meta-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+.paper-preview .paper-meta-table td {
+  border: 1px solid #000;
+  padding: 5px 8px;
+  width: 50%;
+}
+.paper-preview .paper-instructions {
+  font-size: 11px;
+  font-style: italic;
+  border: 1px solid #ccc;
+  padding: 8px;
+  margin-bottom: 12px;
+  background: #fafafa;
+}
+.paper-preview .paper-section-label {
+  border: 2px solid #000;
+  padding: 2px 20px;
+  font-weight: bold;
+  font-size: 12px;
+  display: table;
+  margin: 12px auto 8px;
+}
+.paper-preview .paper-section-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.paper-preview .paper-mcq-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  padding-left: 14px;
+  font-size: 12px;
+}
+.paper-preview .paper-question {
+  margin-bottom: 10px;
+}
+
+/* Punjab board table layout (Mukabbir preboard style) */
+.paper-preview .board-college-name {
+  text-align: center;
+  font-weight: bold;
+  font-size: 17px;
+}
+.paper-preview .board-exam-title {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.paper-preview .board-meta-table,
+.paper-preview .board-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+.paper-preview .board-meta-table td,
+.paper-preview .board-table td {
+  border: 1px solid #000;
+  padding: 5px 8px;
+  vertical-align: top;
+}
+.paper-preview .board-section-head td {
+  font-weight: bold;
+  background: #f0f0f0;
+}
+.paper-preview .board-num,
+.paper-preview .board-roman {
+  width: 36px;
+  text-align: center;
+  font-weight: bold;
+}
+.paper-preview .board-roman {
+  text-transform: lowercase;
+}
+.paper-preview .board-subjective-title {
+  text-align: center;
+  font-weight: bold;
+  margin: 12px 0 6px;
+}
+.paper-preview .board-student-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+.paper-preview .board-opt-row {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4px;
+}
+.paper-preview .board-opt-row td {
+  border: 1px solid #ccc;
+  font-size: 11px;
+}
+
+@media (max-width: 991px) {
+  .td-preview-card {
+    position: static;
+  }
 }

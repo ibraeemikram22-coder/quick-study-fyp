@@ -1,0 +1,12 @@
+/* Shared admin theme — matches Quick Study Builder (home.css) */
+:root {
+  --admin-purple: #b081d2;
+  --admin-purple-deep: #6b4c9a;
+  --admin-purple-dark: #4a3278;
+  --admin-teal: #32c9c4;
+  --admin-gold: #ffeb3a;
+  --admin-bg: #f5f5f5;
+  --admin-card-border: #e8e0f5;
+  --admin-text: #1d1d1f;
+  --admin-muted: #555;
+}

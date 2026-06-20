@@ -1,5 +1,8 @@
 from flask import Blueprint, jsonify, request
 
+from modules.gemini_usage import get_usage
+from sqlalchemy import func
+
 from modules.questionbank.db import SessionLocal, database_info, init_db
 from modules.questionbank.models import (
     ActivityLog,
@@ -24,6 +27,11 @@ def _ok(data=None, **extra):
     return jsonify(payload)
 
 
+@admin_bp.route("/api/admin/gemini-usage", methods=["GET"])
+def admin_gemini_usage():
+    return _ok(get_usage())
+
+
 @admin_bp.route("/api/admin/stats", methods=["GET"])
 def admin_stats():
     init_db()
@@ -33,9 +41,9 @@ def admin_stats():
             {
                 "database": database_info(),
                 "users": db.query(User).count(),
-                "students": db.query(User).filter(User.role == "student").count(),
-                "teachers": db.query(User).filter(User.role == "teacher").count(),
-                "admins": db.query(User).filter(User.role == "admin").count(),
+                "students": db.query(User).filter(func.lower(User.role) == "student").count(),
+                "teachers": db.query(User).filter(func.lower(User.role) == "teacher").count(),
+                "admins": db.query(User).filter(func.lower(User.role) == "admin").count(),
                 "questions": db.query(Question).count(),
                 "savedPapers": db.query(SavedPaper).count(),
                 "contactMessages": db.query(ContactFeedback).count(),

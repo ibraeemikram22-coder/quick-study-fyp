@@ -209,3 +209,37 @@ def transcript_get(record_id):
         return jsonify({"success": True, "data": transcript_to_dict(row, include_text=True)})
     finally:
         db.close()
+
+
+@transcript_bp.route("/history/clear", methods=["DELETE"])
+def transcript_clear():
+    init_db()
+    user_id = request.args.get("userId") or request.args.get("user_id")
+    db = SessionLocal()
+    try:
+        q = db.query(TranscriptRecord)
+        if user_id:
+            try:
+                q = q.filter(TranscriptRecord.user_id == int(user_id))
+            except (TypeError, ValueError):
+                pass
+        deleted = q.delete(synchronize_session=False)
+        db.commit()
+        return jsonify({"success": True, "deleted": deleted})
+    finally:
+        db.close()
+
+
+@transcript_bp.route("/history/<int:record_id>", methods=["DELETE"])
+def transcript_delete(record_id):
+    init_db()
+    db = SessionLocal()
+    try:
+        row = db.query(TranscriptRecord).filter(TranscriptRecord.id == record_id).first()
+        if not row:
+            return jsonify({"success": False, "error": "Transcript not found"}), 404
+        db.delete(row)
+        db.commit()
+        return jsonify({"success": True, "deleted": record_id})
+    finally:
+        db.close()

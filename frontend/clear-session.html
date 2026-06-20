@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clearing session…</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Poppins, sans-serif;
+      background: linear-gradient(145deg, #ebe3ff, #fff);
+      color: #4a3278;
+      text-align: center;
+      padding: 2rem;
+    }
+    .box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 400px;
+      box-shadow: 0 12px 40px rgba(107, 76, 154, 0.12);
+    }
+    h1 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+    p { color: #666; font-size: 0.9rem; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Session cleared</h1>
+    <p>Redirecting to sign in…</p>
+  </div>
+  <script>
+    (function () {
+      var keys = [
+        "qsb_user",
+        "qsb_session_meta",
+        "qsb_module_usage",
+        "qsb_avatars",
+        "qsb_admin_tab"
+      ];
+      keys.forEach(function (k) {
+        try { localStorage.removeItem(k); } catch (e) {}
+      });
+      try { sessionStorage.removeItem("qsb_auth_block"); } catch (e) {}
+      try { sessionStorage.removeItem("qsb_sso_return"); } catch (e) {}
+      try { sessionStorage.removeItem("geminiCheck"); } catch (e) {}
+      setTimeout(function () {
+        window.location.replace("login.html?signup=1&reset=1");
+      }, 800);
+    })();
+  </script>
+</body>
+</html>

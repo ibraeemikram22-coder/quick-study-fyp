@@ -150,6 +150,7 @@ async function pollJob(jobId, flow) {
       setFlowStep("done");
       setProgressBar(100);
       renderResult(data.result, flow);
+      recordModuleUse("summarizer");
       return;
     }
     if (data.status === "error") {
@@ -277,7 +278,7 @@ function renderResult(data, flow = "text") {
   let msg = `Summary ready — ${bullets} bullets, ${orig} → ${sum} words (${pct}% shorter).`;
 
   if (meta.bulletCountMatched === false) {
-    msg += ` AI returned ${meta.actualBulletCount}; trimmed to ${bullets}.`;
+    msg += ` Adjusted to ${bullets} bullet points.`;
   }
 
   if (meta.source === "file" && meta.fileName) {
@@ -304,7 +305,7 @@ async function requestSummary(url, options, flowLabel, flow = "text", quick = tr
   startProcessingUi(flow, quick);
   setStatus(
     "processing",
-    `${flowLabel} — backend is summarizing with AI...`,
+    `${flowLabel} — Processing your content…`,
     false,
     flow
   );
@@ -326,9 +327,11 @@ async function requestSummary(url, options, flowLabel, flow = "text", quick = tr
 
     if (!res.ok || !data.success) {
       const err = data.error || `Request failed (${res.status}).`;
-      const friendly = /503|unavailable|high demand|busy|rate limit/i.test(err)
-        ? "Gemini is busy. Wait 1–2 minutes, then click Generate Summary again. Avoid clicking many times quickly."
-        : err;
+      const friendly = /503|unavailable|high demand|busy|rate limit|quota/i.test(err)
+        ? "The service is busy. Please wait a few minutes and try again."
+        : typeof toUserMessage === "function"
+          ? toUserMessage(new Error(err))
+          : err;
       setStatus("processing", friendly, true, flow);
       setOutputMessage(friendly, true);
       hideProgressUi();
@@ -336,11 +339,12 @@ async function requestSummary(url, options, flowLabel, flow = "text", quick = tr
     }
 
     renderResult(data, flow);
+    recordModuleUse("summarizer");
   } catch (err) {
-    console.error(err);
     const msg =
-      err.message ||
-      "Cannot reach backend. Start: cd backend → python app.py — then open http://localhost:5500";
+      typeof toUserMessage === "function"
+        ? toUserMessage(err)
+        : "Unable to complete request. Please try again.";
     setStatus("processing", msg, true, flow);
     setOutputMessage(msg, true);
     hideProgressUi();
@@ -351,6 +355,7 @@ async function requestSummary(url, options, flowLabel, flow = "text", quick = tr
 }
 
 generateBtn.onclick = async () => {
+  if (!requireModuleAccess("summarizer", "Summarized Notes")) return;
   const bullets = parseInt(bulletCount.value, 10) || 5;
   const style = formatStyle?.value || "chapter";
   const lang = outputLanguage?.value || "same";
@@ -486,15 +491,8 @@ inputText.addEventListener("input", () => {
 
 setStatus("idle", "Paste text or import a file, then click Generate Summary.");
 
-function refreshSummarizerHistory() {
-  if (typeof mountModuleHistory !== "function") return;
-  mountModuleHistory({
-    containerId: "moduleHistoryList",
-    module: "summarizer",
-    onLoad(row) {
-      if (row.result) renderResult(row.result, "text");
-    },
-  });
-}
+function refreshSummarizerHistory() {}
 
-refreshSummarizerHistory();
+bootHistoryFromUrl((id) => `/api/records/${id}`, (row) => {
+  if (row.result) renderResult(row.result, "text");
+});

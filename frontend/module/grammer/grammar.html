@@ -10,11 +10,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="../../assets/css/module-ui.css">
+<link rel="stylesheet" href="../../assets/css/auth-portal.css">
 <link rel="stylesheet" href="../../assets/css/grammar.css">
 <link rel="stylesheet" href="../../assets/css/layout.css">
 </head>
 
-<body class="module-tool-page">
+<body class="module-tool-page" data-auth-module="grammar">
 
 <div id="header"></div>
 
@@ -29,6 +30,7 @@
 <!-- TOOL -->
 <section class="py-5">
 <div class="container">
+<div id="usageBanner"></div>
 
 <div class="row g-4 align-items-stretch">
 
@@ -47,7 +49,8 @@
   <label class="form-check-label">Convert to Notes</label>
 </div>
 
-<div class="text-end">
+<div class="d-flex gap-2 mt-2 flex-wrap justify-content-end align-items-center">
+<a class="small-btn history-btn" href="../history/saved.html?module=grammar" target="_blank" rel="noopener">Saved</a>
 <button class="action-btn" id="check-btn">
 <i class="fas fa-spell-check me-2"></i>Check Grammar
 </button>
@@ -83,10 +86,6 @@ Your corrected text will appear here...
 
 </div>
 
-    <div class="admin-card mt-4">
-      <h5 class="mb-2"><i class="fas fa-clock-rotate-left me-1"></i> Recent history (MySQL)</h5>
-      <div id="moduleHistoryList"></div>
-    </div>
 </section>
 
 <section class="module-guide-section">
@@ -136,6 +135,11 @@ Your corrected text will appear here...
 
 <script src="../../assets/js/header-footer.js"></script>
 <script src="../../assets/js/api-config.js"></script>
+<script src="../../assets/js/friendly-errors.js"></script>
+<script src="../../assets/js/auth-sso.js"></script>
+<script src="../../assets/js/auth-session.js"></script>
+<script src="../../assets/js/auth-portal.js"></script>
+<script src="../../assets/js/usage-gate.js"></script>
 <script src="../../assets/js/module-history.js"></script>
 <script src="../../assets/js/grammar.js"></script>
 

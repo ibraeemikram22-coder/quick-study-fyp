@@ -7,62 +7,84 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../assets/css/home.css">
+  <link rel="stylesheet" href="../../assets/css/admin-theme.css">
   <link rel="stylesheet" href="../../assets/css/module-ui.css">
   <link rel="stylesheet" href="../../assets/css/questionbank-admin.css">
-  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/auth-portal.css">
 </head>
-<body>
-  <div id="header"></div>
+<body class="qb-admin-shell">
+  <header class="qb-admin-topbar">
+    <a href="../../admin/dashboard.html"><i class="fas fa-arrow-left me-1"></i> Control Panel</a>
+    <span class="qb-admin-topbar-title">Question Bank Admin</span>
+    <span class="small opacity-75" id="qbAdminUserLabel"></span>
+  </header>
 
   <section class="admin-hero">
     <div class="container">
-      <h1 class="fw-bold">Question Bank <span class="text-primary">Admin</span></h1>
-      <p class="lead mb-0">Board → Subject → Book → Chapter (paste) → Generate questions → Database</p>
-      <a href="../../admin/dashboard.html" class="btn btn-sm btn-outline-secondary mt-2">
-        <i class="fas fa-arrow-left me-1"></i> Back to Admin Control Panel
-      </a>
+      <h1 class="fw-bold mb-2">Question Bank <span class="text-primary">Admin</span></h1>
+      <p class="lead mb-0 text-muted">Upload textbooks, split chapters, and prepare content for the teacher dashboard.</p>
     </div>
   </section>
 
   <section class="pb-5">
     <div class="container">
-      <p id="adminStatus" class="status-bar mb-3">Loading...</p>
+      <p id="adminStatus" class="status-bar mb-3" style="display:none;"></p>
+
+      <div id="adminUploadBar" class="admin-upload-bar" style="display:none;" aria-live="polite">
+        <div class="admin-upload-bar-inner">
+          <div class="admin-upload-head">
+            <span class="admin-upload-spinner" aria-hidden="true"></span>
+            <span id="adminUploadMessage" class="admin-upload-title">Uploading book…</span>
+            <span id="adminUploadPercent" class="admin-upload-percent">0%</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div id="adminUploadProgressFill" class="progress-fill"></div>
+          </div>
+          <div class="admin-upload-foot">
+            <p id="adminUploadStep" class="admin-upload-step mb-0">Saving PDF to server…</p>
+            <span id="adminUploadTimer" class="admin-upload-timer">00:00</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="setupAlert" class="alert alert-warning d-none mb-3" role="alert"></div>
 
       <div class="admin-card mb-3 quick-start">
-        <h5 class="mb-2"><i class="fas fa-circle-info me-1"></i> Quick start</h5>
+        <h5 class="mb-2"><i class="fas fa-circle-info me-1"></i> Quick workflow</h5>
+        <p class="small mb-2"><strong>Admin:</strong> Setup → Upload books. <strong>Teacher:</strong> Create exam papers.</p>
         <ol class="small mb-2 ps-3">
-          <li>Start backend: <code>cd backend && python app.py</code> (port 3000)</li>
-          <li>First time: click <strong>Load sample data</strong> for boards, Physics, and sample chapters</li>
-          <li><strong>Setup</strong> → add your board, subject, book, and paper pattern</li>
-          <li><strong>Chapters</strong> → paste text → Save to database</li>
-          <li><strong>Generate</strong> → AI creates questions (Gemini; n8n optional)</li>
-          <li><strong>Teacher</strong> dashboard → generate papers from the database</li>
+          <li>Run <strong>START_PROJECT.bat</strong> and set <code>GEMINI_API_KEY</code> in <code>backend/.env</code></li>
+          <li><strong>Load Punjab Board setup</strong> (one time)</li>
+          <li><strong>Books</strong> — upload an official PDF, then use <strong>Fix Chapters</strong> if needed</li>
+          <li><strong>Teacher Dashboard</strong> — select class, book, chapters, and create a paper</li>
         </ol>
-        <button type="button" class="btn btn-outline-primary btn-sm" id="seedSampleBtn">
-          <i class="fas fa-database me-1"></i>Load sample data
+        <button type="button" class="btn btn-primary btn-sm" id="punjabSetupBtn">
+          <i class="fas fa-database me-1"></i>Load Punjab Board setup
         </button>
         <span class="text-muted small ms-2">Set <code>GEMINI_API_KEY</code> in <code>backend/.env</code> for question generation</span>
       </div>
 
-      <ul class="nav nav-pills mb-3 flex-wrap" id="adminTabs">
-        <li class="nav-item"><button class="nav-link active" data-tab="setup">Setup</button></li>
-        <li class="nav-item"><button class="nav-link" data-tab="chapters">Chapters</button></li>
-        <li class="nav-item"><button class="nav-link" data-tab="generate">Generate</button></li>
-        <li class="nav-item"><button class="nav-link" data-tab="questions">Questions</button></li>
-        <li class="nav-item"><button class="nav-link" data-tab="import">Import JSON</button></li>
-        <li class="nav-item"><button class="nav-link" data-tab="json">JSON Preview</button></li>
+      <ul class="nav nav-pills mb-2 flex-wrap" id="adminTabs">
+        <li class="nav-item"><button type="button" class="nav-link active" data-tab="setup">Setup</button></li>
+        <li class="nav-item"><button type="button" class="nav-link" data-tab="chapters">Books</button></li>
+        <li class="nav-item"><button type="button" class="nav-link" data-tab="generate">Advanced</button></li>
+        <li class="nav-item"><button type="button" class="nav-link" data-tab="questions">Questions</button></li>
+        <li class="nav-item"><button type="button" class="nav-link" data-tab="import">Import JSON</button></li>
       </ul>
 
       <!-- SETUP -->
       <div class="tab-panel" data-panel="setup">
+        <div class="alert alert-info small mb-3">
+          <strong>Punjab Board setup</strong> runs from the button above (board, classes, 6 exam types, patterns).
+          Use manual add only when needed. Click <strong>Remove</strong> beside any item to delete it.
+        </div>
         <div class="row g-3">
           <div class="col-md-6">
             <div class="admin-card">
               <h5>Board</h5>
-              <input id="boardName" class="form-control mb-2" placeholder="Punjab Board">
-              <input id="boardCode" class="form-control mb-2" placeholder="punjab">
-              <button class="btn btn-primary btn-sm" id="addBoardBtn">Add Board</button>
+              <input id="boardName" class="form-control mb-2" placeholder="Punjab Board" value="Punjab Board" readonly>
+              <input id="boardCode" class="form-control mb-2" placeholder="punjab" value="punjab" readonly>
+              <p class="small text-muted mb-0">Punjab Board only (Federal / FBISE removed).</p>
               <ul id="boardList" class="mt-3 small"></ul>
             </div>
           </div>
@@ -77,10 +99,11 @@
           </div>
           <div class="col-md-6">
             <div class="admin-card">
-              <h5>Exam Type</h5>
-              <input id="examName" class="form-control mb-2" placeholder="Mids">
-              <input id="examCode" class="form-control mb-2" placeholder="mid">
-              <button class="btn btn-primary btn-sm" id="addExamBtn">Add Exam</button>
+              <h5>Exam Types</h5>
+              <p class="small text-muted mb-2">Weekly, Monthly, Quarter (30m), Half Book, Pre Board (100m), Class Assessment</p>
+              <input id="examName" class="form-control mb-2" placeholder="e.g. Weekly Test">
+              <input id="examCode" class="form-control mb-2" placeholder="e.g. weekly">
+              <button class="btn btn-outline-secondary btn-sm" id="addExamBtn">Add custom exam</button>
               <ul id="examList" class="mt-3 small"></ul>
             </div>
           </div>
@@ -96,20 +119,30 @@
             <div class="admin-card">
               <h5>Book</h5>
               <select id="bookSubjectId" class="form-select mb-2"></select>
-              <input id="bookName" class="form-control mb-2" placeholder="PTB Physics">
+              <input id="bookName" class="form-control mb-2" placeholder="e.g. Physics 11">
               <button class="btn btn-primary btn-sm" id="addBookBtn">Add Book</button>
               <ul id="bookList" class="mt-3 small"></ul>
             </div>
           </div>
           <div class="col-md-6">
             <div class="admin-card">
-              <h5>Paper Pattern</h5>
+              <h5>Paper Pattern (Section A / B / C)</h5>
               <select id="patternBoardId" class="form-select mb-2"></select>
               <select id="patternExamId" class="form-select mb-2"></select>
-              <div class="row g-2">
-                <div class="col-4"><input id="patMcq" class="form-control" type="number" value="15" placeholder="MCQ"></div>
-                <div class="col-4"><input id="patShort" class="form-control" type="number" value="10" placeholder="Short"></div>
-                <div class="col-4"><input id="patLong" class="form-control" type="number" value="5" placeholder="Long"></div>
+              <p class="small text-muted mb-2">Weekly/Monthly/Quarter: A=6 MCQ, B=12 Short, C=1 Long (30m). Pre Board: 15, 10, 5 (100m).</p>
+              <div class="pattern-sections-grid">
+                <div class="pattern-sec-box">
+                  <span class="pattern-sec-label">Section A — MCQs</span>
+                  <input id="patMcq" class="form-control" type="number" value="6" min="0" placeholder="MCQ count">
+                </div>
+                <div class="pattern-sec-box">
+                  <span class="pattern-sec-label">Section B — Short</span>
+                  <input id="patShort" class="form-control" type="number" value="12" min="0" placeholder="Short count">
+                </div>
+                <div class="pattern-sec-box">
+                  <span class="pattern-sec-label">Section C — Long</span>
+                  <input id="patLong" class="form-control" type="number" value="1" min="0" placeholder="Long count">
+                </div>
               </div>
               <button class="btn btn-primary btn-sm mt-2" id="addPatternBtn">Save Pattern</button>
               <ul id="patternList" class="mt-3 small"></ul>
@@ -120,13 +153,59 @@
 
       <!-- CHAPTERS -->
       <div class="tab-panel d-none" data-panel="chapters">
-        <div class="admin-card">
-          <h5>Add Chapter (paste lecture / book text)</h5>
-          <select id="chapterBookId" class="form-select mb-2"></select>
-          <input id="chapterTitle" class="form-control mb-2" placeholder="Ch1 Motion">
-          <textarea id="chapterContent" class="form-control mb-2" rows="8" placeholder="Paste chapter text here..."></textarea>
-          <button class="btn btn-success" id="saveChapterBtn"><i class="fas fa-save me-1"></i>Save to Database</button>
-          <ul id="chapterList" class="mt-3"></ul>
+        <div class="admin-card mb-3">
+          <h5><i class="fas fa-cloud-upload-alt me-1"></i>Upload book (single form)</h5>
+          <p class="small mb-2 text-muted">
+            Enter class, subject, and book name, then choose an official Punjab textbook PDF (watermark-free).
+            A new book record is created automatically when needed.
+          </p>
+          <p class="small text-danger mb-2" id="pdfBookHint"></p>
+          <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+              <label class="small fw-semibold" for="uploadClassLevel">Class</label>
+              <select id="uploadClassLevel" class="form-select">
+                <option value="11">11th — Part 1</option>
+                <option value="12">12th — Part 2</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="small fw-semibold" for="uploadSubjectName">Subject</label>
+              <input id="uploadSubjectName" class="form-control" list="subjectNameSuggestions" placeholder="e.g. Physics">
+              <datalist id="subjectNameSuggestions"></datalist>
+            </div>
+            <div class="col-md-6">
+              <label class="small fw-semibold" for="uploadBookName">Book name</label>
+              <input id="uploadBookName" class="form-control" placeholder="e.g. Physics 11, Biology 12, Urdu 11…">
+            </div>
+            <div class="col-md-8">
+              <label class="small fw-semibold" for="uploadPdfFile">PDF file</label>
+              <input type="file" id="uploadPdfFile" class="form-control" accept=".pdf">
+            </div>
+            <div class="col-md-4">
+              <button type="button" class="btn btn-primary w-100" id="unifiedUploadBtn">
+                <i class="fas fa-upload me-1"></i>Upload Book PDF
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="admin-card mb-3">
+          <h5 class="mb-2">Uploaded books — manage</h5>
+          <p class="small text-muted mb-2">Books with uploaded PDFs appear here. Use <strong>Clear</strong> to remove failed uploads.</p>
+          <div id="booksManageTable" class="table-responsive"></div>
+        </div>
+        <div class="admin-card mt-3">
+          <h5 class="mb-2">Chapters in selected book</h5>
+          <select id="chapterBookId" class="form-select mb-3"></select>
+          <div id="chapterList" class="chapter-status-table"></div>
+          <details class="mt-3">
+            <summary class="small fw-semibold text-muted" style="cursor:pointer;">Advanced — paste chapter text manually</summary>
+            <input id="chapterTitle" class="form-control mb-2 mt-2" placeholder="Ch 1 — Introduction">
+            <textarea id="chapterContent" class="form-control mb-2" rows="6" placeholder="Paste chapter text…"></textarea>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-success btn-sm" id="saveChapterBtn"><i class="fas fa-save me-1"></i>Save</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="cancelChapterBtn">Clear</button>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -177,67 +256,23 @@
         </div>
       </div>
 
-      <!-- JSON -->
-      <div class="tab-panel d-none" data-panel="json">
-        <div class="admin-card">
-          <h5>Last API JSON response</h5>
-          <pre id="jsonPreview" class="json-preview">{}</pre>
-        </div>
-      </div>
+      <pre id="jsonPreview" class="json-preview d-none" aria-hidden="true">{}</pre>
     </div>
   </section>
 
-  <section class="module-guide-section">
-    <div class="container">
-      <div class="module-guide">
-        <h5><i class="fas fa-circle-info me-2"></i>How to use Question Bank Admin</h5>
-        <p class="guide-lead">Set up your syllabus once — teachers then generate papers from stored questions.</p>
-        <div class="module-guide-steps guide-cols-2">
-          <div class="module-guide-step">
-            <span class="step-num">1</span>
-            <div>
-              <h6>Setup tab — structure</h6>
-              <p>Add board, class, exam type, subject, book, and paper pattern (how many MCQs, short, and long questions per paper).</p>
-            </div>
-          </div>
-          <div class="module-guide-step">
-            <span class="step-num">2</span>
-            <div>
-              <h6>Chapters tab — content</h6>
-              <p>Select a book, enter a chapter title, paste lecture or textbook text, and save. This text is used to generate questions.</p>
-            </div>
-          </div>
-          <div class="module-guide-step">
-            <span class="step-num">3</span>
-            <div>
-              <h6>Generate tab — AI questions</h6>
-              <p>Pick a chapter and set counts. Click generate — questions are saved to the database automatically (about 30–60 seconds).</p>
-            </div>
-          </div>
-          <div class="module-guide-step">
-            <span class="step-num">4</span>
-            <div>
-              <h6>Review &amp; import</h6>
-              <p>Use the Questions tab to view saved items. Import JSON if you have questions from an external tool. Teachers use their dashboard to build final papers.</p>
-            </div>
-          </div>
-        </div>
-        <div class="module-guide-tip">
-          <i class="fas fa-lightbulb me-2"></i>
-          <strong>Tip:</strong> n8n is optional — built-in Gemini generation works without it. Load sample data on first run to see a working demo.
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div id="footer"></div>
-  <script src="../../assets/js/header-footer.js"></script>
+  <script src="../../assets/js/friendly-errors.js"></script>
   <script src="../../assets/js/api-config.js"></script>
-  <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/auth-sso.js"></script>
+<script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/auth-portal.js"></script>
   <script src="../../assets/js/questionbank-admin.js"></script>
   <script>
-    const adminUser = requireLogin(["admin"]);
-    if (adminUser) showDashboardBar(adminUser, "Admin — Question Bank");
+    const qbAdminOk = requireLogin(["admin"]);
+    if (qbAdminOk) {
+      const label = document.getElementById("qbAdminUserLabel");
+      if (label) label.textContent = qbAdminOk.name || qbAdminOk.email || "Admin";
+      if (typeof bootQuestionBankAdmin === "function") bootQuestionBankAdmin();
+    }
   </script>
 </body>
 </html>

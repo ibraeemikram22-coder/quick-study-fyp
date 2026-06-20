@@ -101,8 +101,35 @@ async function loadStats() {
   }
   document.getElementById("dbInfo").textContent =
     db.driver === "mysql"
-      ? `Connected to MySQL (${db.url || "localhost"}). All modules share this database.`
-      : `Using SQLite file: ${db.path || "local"}. Add MYSQL_* to .env for MySQL.`;
+      ? `MySQL database (${db.url || "localhost"})`
+      : `Local database file (${db.path || "questionbank.db"})`;
+}
+
+async function loadApiUsage() {
+  const panel = document.getElementById("apiUsagePanel");
+  if (!panel) return;
+  try {
+    const usage = await apiFetch("/api/admin/gemini-usage");
+    const pct = Math.min(100, usage.percentUsed || 0);
+    const barClass = usage.quotaExceeded ? "bg-danger" : pct > 80 ? "bg-warning" : "bg-success";
+    const statusText = !usage.apiKeyConfigured
+      ? "AI service is not configured."
+      : usage.quotaExceeded
+        ? "Daily quota reached. Service resumes automatically tomorrow."
+        : "AI service is active.";
+    panel.innerHTML = `
+      <p class="mb-2">${esc(statusText)}</p>
+      <div class="d-flex justify-content-between small mb-1">
+        <span>Requests today: <strong>${usage.used ?? 0}</strong> / ${usage.limit ?? "—"}</span>
+        <span>Remaining: <strong>${usage.remaining ?? 0}</strong></span>
+      </div>
+      <div class="progress mb-2" style="height:8px">
+        <div class="progress-bar ${barClass}" style="width:${pct}%"></div>
+      </div>
+      <p class="small text-muted mb-0">Resets daily at midnight. API key is stored securely on the server.</p>`;
+  } catch {
+    panel.innerHTML = '<p class="text-muted mb-0">Unable to load usage information.</p>';
+  }
 }
 
 let msgModal;
@@ -306,16 +333,19 @@ async function loadHistory() {
 }
 
 async function refreshAll() {
-  setStatus("Refreshing from database...");
+  setStatus("Please wait…");
   await Promise.all([
     loadStats(),
+    loadApiUsage(),
     loadContact(),
     loadUsers(),
     loadPapers(),
     loadModuleHistory(),
     loadHistory(),
   ]);
-  setStatus("All data loaded from database.");
+  setStatus("");
+  const statusEl = document.getElementById("adminStatus");
+  if (statusEl) statusEl.style.display = "none";
 }
 
 const user = requireLogin(["admin"]);
@@ -331,7 +361,10 @@ if (!user) {
   initNav();
   renderModuleGrid();
   document.getElementById("refreshAllBtn")?.addEventListener("click", () =>
-    refreshAll().catch((e) => setStatus(e.message, true))
+    refreshAll().catch((e) => setStatus(toUserMessage ? toUserMessage(e) : e.message, true))
+  );
+  document.getElementById("refreshApiUsageBtn")?.addEventListener("click", () =>
+    loadApiUsage().catch((e) => setStatus(toUserMessage ? toUserMessage(e) : e.message, true))
   );
   document.getElementById("refreshContactBtn")?.addEventListener("click", () =>
     loadContact().catch((e) => setStatus(e.message, true))
