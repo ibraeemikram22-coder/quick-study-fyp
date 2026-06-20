@@ -3,7 +3,7 @@
  * Local: START_PROJECT.bat (port 3000)
  * Live: set PRODUCTION_API_URL below after deploying backend on Render/Railway
  */
-const PRODUCTION_API_URL = ""; // e.g. "https://your-app.onrender.com"
+const PRODUCTION_API_URL = "https://ibraheemikram.pythonanywhere.com";
 
 const API_BASE = (() => {
   const host = window.location.hostname;
