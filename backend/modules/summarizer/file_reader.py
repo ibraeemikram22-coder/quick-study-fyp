@@ -3,12 +3,16 @@ def read_pdf(file):
 
 
 def _read_pdf_pypdf2(file, max_pages=None, max_chars=800_000):
+    PdfReader = None
     try:
-        from PyPDF2 import PdfReader
+        from pypdf import PdfReader
     except ImportError:
-        raise RuntimeError(
-            "PDF support missing. Run: pip install PyPDF2 python-docx"
-        )
+        try:
+            from PyPDF2 import PdfReader
+        except ImportError:
+            raise RuntimeError(
+                "PDF support missing. Run: pip install pypdf python-docx"
+            )
 
     if hasattr(file, "seek"):
         file.seek(0)

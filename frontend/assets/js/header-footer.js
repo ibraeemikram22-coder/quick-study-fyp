@@ -36,6 +36,7 @@ fetch(getBasePath() + "layout/header.html")
 
     const overlay = document.getElementById("mobileOverlay");
     if (overlay) {
+      document.body.appendChild(overlay);
       applyNavLinks(overlay);
     }
 
@@ -43,17 +44,29 @@ fetch(getBasePath() + "layout/header.html")
     const closeBtn = document.getElementById("mobileClose");
 
     if (hamburger && overlay) {
-      hamburger.addEventListener("click", () => overlay.classList.add("active"));
+      hamburger.addEventListener("click", () => {
+        overlay.classList.add("active");
+        document.body.classList.add("mobile-menu-open");
+      });
     }
     if (closeBtn && overlay) {
-      closeBtn.addEventListener("click", () => overlay.classList.remove("active"));
+      closeBtn.addEventListener("click", () => {
+        overlay.classList.remove("active");
+        document.body.classList.remove("mobile-menu-open");
+      });
     }
     if (overlay) {
       overlay.addEventListener("click", (e) => {
-        if (e.target === overlay) overlay.classList.remove("active");
+        if (e.target === overlay) {
+          overlay.classList.remove("active");
+          document.body.classList.remove("mobile-menu-open");
+        }
       });
       overlay.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => overlay.classList.remove("active"));
+        link.addEventListener("click", () => {
+          overlay.classList.remove("active");
+          document.body.classList.remove("mobile-menu-open");
+        });
       });
     }
 

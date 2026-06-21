@@ -35,11 +35,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const res = await fetch(`${API_BASE}/grammar/check`, moduleHistoryFetchOpts({ text }));
 
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || data.error) {
+            const msg =
+                data.error ||
+                (typeof toUserMessage === "function" ? toUserMessage("backend") : "Grammar check failed.");
+            output.innerText = msg;
+            percent.innerText = "Errors: —";
+            explanationBox.innerHTML = "";
+            return;
+        }
 
         originalText = text;
-        correctedText = data.corrected;
-        errorsList = data.errors;
+        correctedText = data.corrected || "";
+        errorsList = data.errors || [];
 
         if (notesCheckbox.checked) {
             correctedText = correctedText
