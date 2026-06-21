@@ -9,6 +9,7 @@ from modules.gemini_config import (
     RETRYABLE_STATUSES,
     SKIP_MODEL_STATUSES,
     gemini_model_chain,
+    gemini_post,
     gemini_url,
 )
 
@@ -33,12 +34,7 @@ def _call_gemini_audio(prompt: str, mime_type: str, b64_data: str, api_key: str)
             if wait:
                 time.sleep(wait)
             try:
-                res = requests.post(
-                    gemini_url(model),
-                    params={"key": api_key},
-                    json=body,
-                    timeout=180,
-                )
+                res = gemini_post(gemini_url(model), api_key, body, timeout=180)
             except requests.RequestException as exc:
                 last_err = str(exc)
                 continue

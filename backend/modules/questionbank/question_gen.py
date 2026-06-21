@@ -14,6 +14,7 @@ from modules.gemini_config import (
     gemini_api_keys,
     is_quota_exceeded,
     gemini_model_chain,
+    gemini_post,
     gemini_url as _gemini_url,
 )
 
@@ -213,12 +214,7 @@ def _call_gemini_json(prompt, api_key, temperature=0.88):
                 if wait:
                     time.sleep(wait)
                 try:
-                    res = requests.post(
-                        _gemini_url(model),
-                        params={"key": use_key},
-                        json=body,
-                        timeout=180,
-                    )
+                    res = gemini_post(_gemini_url(model), use_key, body, timeout=180)
                 except requests.RequestException as exc:
                     last_err = str(exc)
                     continue

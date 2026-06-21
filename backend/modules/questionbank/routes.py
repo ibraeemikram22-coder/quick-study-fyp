@@ -90,7 +90,7 @@ def gemini_check():
 
     import requests
 
-    from modules.gemini_config import format_gemini_failure, gemini_model_chain, gemini_url
+    from modules.gemini_config import format_gemini_failure, gemini_model_chain, gemini_post, gemini_url
 
     force = request.args.get("refresh") == "1"
     now = time.time()
@@ -121,12 +121,7 @@ def gemini_check():
     }
     model = gemini_model_chain()[0]
     try:
-        res = requests.post(
-            gemini_url(model),
-            params={"key": api_key},
-            json=body,
-            timeout=45,
-        )
+        res = gemini_post(gemini_url(model), api_key, body, timeout=45)
     except Exception as exc:
         payload = {"ok": False, "reason": "network", "message": str(exc)[:200]}
         _GEMINI_CHECK_CACHE.update(ts=now, payload=payload)

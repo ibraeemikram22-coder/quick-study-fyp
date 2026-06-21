@@ -65,12 +65,7 @@ def _call_gemini_text(prompt: str, api_key: str) -> str:
             if wait:
                 time.sleep(wait)
             try:
-                res = requests.post(
-                    gemini_url(model),
-                    params={"key": api_key},
-                    json=body,
-                    timeout=120,
-                )
+                res = gemini_post(gemini_url(model), api_key, body, timeout=120)
             except requests.RequestException as exc:
                 last_err = str(exc)
                 continue

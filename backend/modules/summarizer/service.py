@@ -20,6 +20,7 @@ from modules.gemini_config import (
     RETRYABLE_STATUSES as RETRYABLE_STATUS,
     SKIP_MODEL_STATUSES,
     gemini_model_chain,
+    gemini_post,
     gemini_url as _gemini_url,
 )
 MAX_RETRIES_PER_MODEL = 3
@@ -195,12 +196,7 @@ def _call_gemini(prompt, api_key, json_mode=True):
         url = _gemini_url(model)
         for attempt in range(MAX_RETRIES_PER_MODEL):
             try:
-                response = requests.post(
-                    url,
-                    params={"key": api_key},
-                    json=body,
-                    timeout=75,
-                )
+                response = gemini_post(url, api_key, body, timeout=75)
             except requests.RequestException as exc:
                 last_error = str(exc)
                 if attempt < MAX_RETRIES_PER_MODEL - 1:

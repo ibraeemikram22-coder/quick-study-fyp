@@ -44,6 +44,26 @@ def gemini_url(model):
     )
 
 
+def gemini_request_headers(api_key):
+    """Auth headers for Gemini REST (AIza and AQ auth keys)."""
+    return {
+        "Content-Type": "application/json",
+        "x-goog-api-key": (api_key or "").strip(),
+    }
+
+
+def gemini_post(url, api_key, json_body, timeout=90):
+    """POST to Gemini generateContent (header auth — required for AQ keys)."""
+    import requests
+
+    return requests.post(
+        url,
+        headers=gemini_request_headers(api_key),
+        json=json_body,
+        timeout=timeout,
+    )
+
+
 def _error_detail(response_text):
     try:
         payload = json.loads(response_text or "{}")
@@ -89,8 +109,8 @@ def format_gemini_failure(status_code, response_text=""):
 
     if status_code in (401, 403) or "api key" in low or "permission" in low or "invalid" in low:
         return (
-            "Invalid or expired Gemini API key. Open PythonAnywhere → backend/.env → "
-            "set a new GEMINI_API_KEY from Google AI Studio, then Reload the web app."
+            "Gemini API key problem. In PythonAnywhere → backend/.env set GEMINI_API_KEY "
+            "(AI Studio keys may start with AIza or AQ). Then Web → Reload."
         )
 
     if status_code in RETRYABLE_STATUSES or "unavailable" in low or "high demand" in low:

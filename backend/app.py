@@ -105,14 +105,13 @@ def health():
     gemini_status = "missing"
     if keys:
         try:
-            import requests
-            from modules.gemini_config import gemini_model_chain, gemini_url
+            from modules.gemini_config import gemini_model_chain, gemini_post, gemini_url
 
             model = gemini_model_chain()[0]
-            res = requests.post(
+            res = gemini_post(
                 gemini_url(model),
-                params={"key": keys[0]},
-                json={"contents": [{"parts": [{"text": "ok"}]}]},
+                keys[0],
+                {"contents": [{"parts": [{"text": "ok"}]}]},
                 timeout=15,
             )
             gemini_status = "ok" if res.ok else f"error_{res.status_code}"

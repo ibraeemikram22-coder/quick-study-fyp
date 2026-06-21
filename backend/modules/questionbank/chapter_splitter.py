@@ -159,7 +159,7 @@ def _ai_chapter_list(content, expected_count=None, book_name=None):
 
     try:
         import requests
-        from modules.gemini_config import gemini_model_chain, gemini_url
+        from modules.gemini_config import gemini_model_chain, gemini_post, gemini_url
     except ImportError:
         return []
 
@@ -201,12 +201,7 @@ Text sample:
 
     for model in gemini_model_chain():
         try:
-            res = requests.post(
-                gemini_url(model),
-                params={"key": api_key},
-                json=body,
-                timeout=120,
-            )
+            res = gemini_post(gemini_url(model), api_key, body, timeout=120)
             if res.ok:
                 parts = (res.json().get("candidates") or [{}])[0].get("content", {}).get("parts") or []
                 raw = "".join(p.get("text", "") for p in parts if isinstance(p, dict))

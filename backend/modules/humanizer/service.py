@@ -6,7 +6,9 @@ import requests
 from modules.gemini_config import (
     RETRYABLE_STATUSES as RETRYABLE,
     SKIP_MODEL_STATUSES,
+    format_gemini_failure,
     gemini_model_chain,
+    gemini_post,
     gemini_url as _gemini_url,
 )
 
@@ -20,12 +22,7 @@ def _call_gemini(prompt, api_key):
             if wait:
                 time.sleep(wait)
             try:
-                res = requests.post(
-                    _gemini_url(model),
-                    params={"key": api_key},
-                    json=body,
-                    timeout=90,
-                )
+                res = gemini_post(_gemini_url(model), api_key, body, timeout=90)
             except requests.RequestException as exc:
                 last_err = str(exc)
                 continue
