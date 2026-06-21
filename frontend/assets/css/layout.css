@@ -5,6 +5,13 @@
   --text: #333;
 }
 
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 /* Header colors locked — same on Home + all pages (not overridden by module CSS) */
 #main-header .main-nav a {
   color: #eee !important;

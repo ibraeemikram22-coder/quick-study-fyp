@@ -206,7 +206,11 @@ async function handleUserAction() {
     showUserMsg("Signed in successfully. Redirecting…");
     setTimeout(() => goAfterLogin(user), 400);
   } catch (e) {
-    showUserMsg(authPortalFormatError(e), true);
+    const msg = authPortalFormatError(e);
+    showUserMsg(msg, true);
+    if (!isSignup && /account not found|sign up first/i.test(msg)) {
+      tabSignup?.focus();
+    }
   }
 }
 
@@ -267,6 +271,10 @@ function bindPortalSwitchLinks(params) {
   bindPortalSwitchLinks(params);
 
   const online = await checkBackendOnline();
+  const liveHint = document.getElementById("liveHint");
+  const isLocal =
+    window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  if (liveHint) liveHint.style.display = isLocal ? "none" : "block";
   if (backendStatus) {
     if (!online) {
       backendStatus.textContent = "Unable to connect. Please make sure the application is running.";

@@ -66,6 +66,17 @@ body.login-page {
   line-height: 1.45;
 }
 
+.login-hint {
+  font-size: 0.82rem;
+  color: #7a5c00;
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  margin: 0 0 1rem;
+  line-height: 1.4;
+}
+
 .login-mode-tabs {
   display: flex;
   gap: 0.5rem;

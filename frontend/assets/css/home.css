@@ -133,19 +133,9 @@ background:var(--light);
     color:white;
     font-size:2.4em;
 }
-/* FIX: Equal height for all WHY boxes */
-#why-us .row {
-    display: flex;
-    align-items: stretch;
-}
-
-#why-us .col-lg-4 {
-    display: flex;
-}
-
-.why-box {
+/* Bootstrap grid only — custom flex on #why-us caused mobile overflow */
+#why-us .why-box {
     height: 100%;
-    width: 100%;
 }
 /* FEATURES - CARDS */
 .features-section{
@@ -196,5 +186,44 @@ background:var(--light);
     border-radius: 12px; 
     object-fit: cover; 
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-    height: 100%; 
+    height: auto;
+    max-width: 100%;
+}
+
+/* Mobile: prevent white strip / horizontal scroll */
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+#main-header {
+  width: 100%;
+  left: 0;
+  right: 0;
+}
+@media (max-width: 768px) {
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+  .section-title {
+    font-size: 2rem;
+    margin-bottom: 32px;
+  }
+  .features-section,
+  #why-us,
+  .visual-section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .container {
+    padding-left: 14px;
+    padding-right: 14px;
+    max-width: 100%;
+  }
+  .feature-card {
+    margin-bottom: 0;
+  }
 }
