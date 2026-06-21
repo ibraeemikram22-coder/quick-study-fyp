@@ -53,15 +53,24 @@ def gemini_request_headers(api_key):
 
 
 def gemini_post(url, api_key, json_body, timeout=90):
-    """POST to Gemini generateContent (header auth — required for AQ keys)."""
+    """POST to Gemini generateContent (header auth; query fallback for older keys)."""
     import requests
 
-    return requests.post(
-        url,
-        headers=gemini_request_headers(api_key),
-        json=json_body,
-        timeout=timeout,
-    )
+    key = (api_key or "").strip()
+    headers = {
+        "Content-Type": "application/json",
+        "x-goog-api-key": key,
+    }
+    res = requests.post(url, headers=headers, json=json_body, timeout=timeout)
+    if res.status_code == 401 and key:
+        res = requests.post(
+            url,
+            params={"key": key},
+            headers={"Content-Type": "application/json"},
+            json=json_body,
+            timeout=timeout,
+        )
+    return res
 
 
 def _error_detail(response_text):
