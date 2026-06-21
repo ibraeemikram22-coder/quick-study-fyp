@@ -149,6 +149,15 @@ def _handle_youtube(url: str):
     if err_code in ("restricted", "blocked", "unplayable", "invalid_url"):
         return _fail(err_code, err_msg or "Cannot access this video.")
 
+    import os
+
+    if os.getenv("PYTHONANYWHERE_SITE"):
+        return _fail(
+            "no_subtitles",
+            err_msg
+            or "No captions for this video. Use a video with subtitles or upload your own file (max 20 MB).",
+        )
+
     try:
         audio_path = download_audio(url)
         text, source = _transcribe_file(audio_path)

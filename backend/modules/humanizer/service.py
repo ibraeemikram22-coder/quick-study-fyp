@@ -45,7 +45,7 @@ def _call_gemini(prompt, api_key):
                 last_err = res.text[:200]
                 break
             if res.status_code not in RETRYABLE:
-                raise RuntimeError(f"Gemini error ({res.status_code}): {res.text[:200]}")
+                raise RuntimeError(format_gemini_failure(res.status_code, res.text))
             last_err = res.text[:200]
 
     raise RuntimeError(
@@ -54,9 +54,12 @@ def _call_gemini(prompt, api_key):
 
 
 def humanize_text(text, convert_notes=False):
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
+    from modules.gemini_config import format_gemini_failure, gemini_api_keys
+
+    keys = gemini_api_keys()
+    if not keys:
         raise ValueError("GEMINI_API_KEY missing in backend/.env")
+    api_key = keys[0]
 
     prompt = f"""Rewrite this text naturally like a human wrote it.
 

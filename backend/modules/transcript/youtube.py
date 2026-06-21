@@ -175,6 +175,8 @@ def fetch_youtube_transcript(url: str):
     if not video_id:
         return None, "invalid_url", "Invalid YouTube link."
 
+    on_pa = bool(os.getenv("PYTHONANYWHERE_SITE"))
+
     try:
         text = _fetch_via_transcript_api(video_id)
         if text and len(text.split()) >= 2:
@@ -186,14 +188,22 @@ def fetch_youtube_transcript(url: str):
         if code in ("restricted", "blocked", "unplayable"):
             return None, code, msg
 
-    try:
-        text = _fetch_via_ytdlp(url)
-        if text and len(text.split()) >= 2:
-            return text, None, None
-    except Exception as exc:
-        code, msg = classify_youtube_error(exc)
-        if code == "copyright":
-            return None, code, msg
+    if not on_pa:
+        try:
+            text = _fetch_via_ytdlp(url)
+            if text and len(text.split()) >= 2:
+                return text, None, None
+        except Exception as exc:
+            code, msg = classify_youtube_error(exc)
+            if code == "copyright":
+                return None, code, msg
+
+    if on_pa:
+        return (
+            None,
+            "no_subtitles",
+            "No captions found for this video. Try a video with subtitles, or upload your own video/audio file (max 20 MB).",
+        )
 
     return None, "no_subtitles", None
 

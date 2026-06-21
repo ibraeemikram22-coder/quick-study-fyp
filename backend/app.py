@@ -99,8 +99,29 @@ def home():
 
 @app.route("/api/health", methods=["GET"])
 def health():
+    from modules.gemini_config import gemini_api_keys
+
+    keys = gemini_api_keys()
+    gemini_status = "missing"
+    if keys:
+        try:
+            import requests
+            from modules.gemini_config import gemini_model_chain, gemini_url
+
+            model = gemini_model_chain()[0]
+            res = requests.post(
+                gemini_url(model),
+                params={"key": keys[0]},
+                json={"contents": [{"parts": [{"text": "ok"}]}]},
+                timeout=15,
+            )
+            gemini_status = "ok" if res.ok else f"error_{res.status_code}"
+        except Exception as exc:
+            gemini_status = f"error: {exc}"
+
     return {
         "ok": True,
+        "geminiKey": gemini_status,
         "database": database_info(),
         "modules": [
             "grammar /grammar/check",

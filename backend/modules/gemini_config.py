@@ -88,7 +88,10 @@ def format_gemini_failure(status_code, response_text=""):
         return "Daily AI quota reached. Please try again tomorrow."
 
     if status_code in (401, 403) or "api key" in low or "permission" in low or "invalid" in low:
-        return "AI service configuration error. Please contact your administrator."
+        return (
+            "Invalid or expired Gemini API key. Open PythonAnywhere → backend/.env → "
+            "set a new GEMINI_API_KEY from Google AI Studio, then Reload the web app."
+        )
 
     if status_code in RETRYABLE_STATUSES or "unavailable" in low or "high demand" in low:
         return "The AI service is temporarily unavailable. Please try again shortly."
