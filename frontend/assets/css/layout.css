@@ -12,6 +12,39 @@ body {
   overflow-x: hidden;
 }
 
+/* AI quota banner on pages without module-ui.css */
+.ai-quota-banner {
+  display: none;
+  width: 100%;
+  background: linear-gradient(90deg, #7f1d1d, #b45309);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  z-index: 9998;
+  position: relative;
+}
+.ai-quota-banner-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 44px 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+}
+.ai-quota-banner-icon { font-size: 1.25rem; flex-shrink: 0; }
+.ai-quota-banner-title { display: block; font-size: 0.95rem; margin-bottom: 2px; }
+.ai-quota-banner-msg { margin: 0; font-size: 0.84rem; line-height: 1.45; opacity: 0.95; }
+.ai-quota-banner-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 1.35rem;
+  cursor: pointer;
+}
+
 /* Header colors locked — same on Home + all pages (not overridden by module CSS) */
 #main-header .main-nav a {
   color: #eee !important;

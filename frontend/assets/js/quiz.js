@@ -88,8 +88,16 @@ function startQuiz() {
     text: inputText.value,
     limit: parseInt(mcqLimit.value)
   }))
-    .then(res => res.json())
-    .then(data => {
+    .then(res => res.json().then(data => ({ res, data })))
+    .then(({ res, data }) => {
+      if (!res.ok || data.error) {
+        const msg = typeof handleAiModuleError === "function"
+          ? handleAiModuleError(new Error(data.error || "Quiz generation failed."), data)
+          : (typeof toUserMessage === "function" ? toUserMessage(data.error || "Quiz generation failed.") : (data.error || "Quiz generation failed."));
+        outputBox.innerHTML = msg;
+        return;
+      }
+
       quizQuestions = data.questions || [];
 
       if (quizQuestions.length === 0) {
@@ -105,7 +113,10 @@ function startQuiz() {
     })
     .catch(err => {
       console.error(err);
-      outputBox.innerHTML = "❌ Backend error (Flask not running)";
+      const msg = typeof handleAiModuleError === "function"
+        ? handleAiModuleError(err)
+        : (typeof toUserMessage === "function" ? toUserMessage(err) : "Could not generate quiz. Please try again.");
+      outputBox.innerHTML = msg;
     });
 }
 

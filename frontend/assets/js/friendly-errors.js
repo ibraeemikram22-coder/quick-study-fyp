@@ -1,12 +1,49 @@
 /** Map technical API / AI errors to short user-facing messages. */
+
+const QUOTA_LIMIT_MESSAGE =
+  "Daily AI limit reached. Please try again tomorrow — AI tools will work automatically after the quota resets.";
+
+function isQuotaExceededMessage(err) {
+  const msg = String(err?.message || err?.error || err || "").trim();
+  const code = String(err?.code || "").toLowerCase();
+  const m = msg.toLowerCase();
+  return (
+    code === "quota_exceeded" ||
+    /quota|429|rate limit|resource exhausted|daily limit|daily ai/.test(m)
+  );
+}
+
+function formatQuotaResetTime(iso) {
+  if (!iso) return "tomorrow morning";
+  try {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "tomorrow morning";
+    return d.toLocaleString(undefined, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return "tomorrow morning";
+  }
+}
+
+function quotaLimitMessage(resetsAt) {
+  const when = formatQuotaResetTime(resetsAt);
+  return `${QUOTA_LIMIT_MESSAGE} (Expected reset: ${when})`;
+}
+
+/** Map technical API / AI errors to short user-facing messages. */
 function toUserMessage(err) {
-  const msg = String(err?.message || err || "").trim();
+  const msg = String(err?.message || err?.error || err || "").trim();
   const m = msg.toLowerCase();
 
   if (!msg) return "Something went wrong. Please try again.";
 
-  if (/quota|429|rate limit|resource exhausted|daily limit/.test(m)) {
-    return "The AI service is busy right now. Please try again in a few minutes.";
+  if (isQuotaExceededMessage(err) || isQuotaExceededMessage(msg)) {
+    return QUOTA_LIMIT_MESSAGE;
   }
   if (/503|502|504|unavailable|high demand|server busy|temporarily/.test(m) || m.includes("gemini")) {
     return "The AI service is temporarily unavailable. Please try again shortly.";
@@ -35,6 +72,9 @@ function toUserMessage(err) {
 function toAdminMessage(err) {
   const msg = String(err?.message || err || "").trim();
   const m = msg.toLowerCase();
+  if (isQuotaExceededMessage(err)) {
+    return QUOTA_LIMIT_MESSAGE;
+  }
   if (/quota|429|503|gemini|unavailable|busy/.test(m)) {
     return "AI service is busy. Please wait a few minutes and try again.";
   }

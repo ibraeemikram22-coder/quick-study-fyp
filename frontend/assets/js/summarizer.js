@@ -327,13 +327,13 @@ async function requestSummary(url, options, flowLabel, flow = "text", quick = tr
 
     if (!res.ok || !data.success) {
       const err = data.error || `Request failed (${res.status}).`;
-      const friendly = /503|unavailable|high demand|busy|rate limit|quota/i.test(err)
-        ? "The service is busy. Please wait a few minutes and try again."
+      const msg = typeof handleAiModuleError === "function"
+        ? handleAiModuleError(new Error(err), data)
         : typeof toUserMessage === "function"
           ? toUserMessage(new Error(err))
           : err;
-      setStatus("processing", friendly, true, flow);
-      setOutputMessage(friendly, true);
+      setStatus("processing", msg, true, flow);
+      setOutputMessage(msg, true);
       hideProgressUi();
       return;
     }
@@ -341,8 +341,9 @@ async function requestSummary(url, options, flowLabel, flow = "text", quick = tr
     renderResult(data, flow);
     recordModuleUse("summarizer");
   } catch (err) {
-    const msg =
-      typeof toUserMessage === "function"
+    const msg = typeof handleAiModuleError === "function"
+      ? handleAiModuleError(err)
+      : typeof toUserMessage === "function"
         ? toUserMessage(err)
         : "Unable to complete request. Please try again.";
     setStatus("processing", msg, true, flow);

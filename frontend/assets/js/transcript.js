@@ -147,9 +147,16 @@ generateBtn.onclick = async () => {
 
     if (data.success === false || data.error) {
       const isCopyright = data.error === "copyright";
-      setStatus(isCopyright ? "Copyright restriction" : "Could not transcribe", isCopyright ? "copyright" : "error");
+      const errText = data.message || data.transcript || data.error || "Transcription failed.";
+      const msg = !isCopyright && typeof handleAiModuleError === "function"
+        ? handleAiModuleError(new Error(errText), data)
+        : errText;
+      setStatus(
+        isCopyright ? "Copyright restriction" : isQuotaExceededMessage(data) ? "Daily limit reached" : "Could not transcribe",
+        isCopyright ? "copyright" : "error"
+      );
       setMeta(isCopyright ? "Blocked" : "Error", "error");
-      setOutput(data.message || data.transcript || "Transcription failed.", "error-state");
+      setOutput(msg, "error-state");
       return;
     }
 
@@ -164,9 +171,12 @@ generateBtn.onclick = async () => {
     refreshTranscriptHistory();
   } catch (err) {
     console.error(err);
+    const msg = typeof handleAiModuleError === "function"
+      ? handleAiModuleError(err)
+      : "Could not reach the server. Check your connection and try again.";
     setStatus("Connection problem — please try again.", "error");
     setMeta("Offline", "error");
-    setOutput("Could not reach the server. Check your connection and try again.", "error-state");
+    setOutput(msg, "error-state");
   } finally {
     generateBtn.disabled = false;
   }

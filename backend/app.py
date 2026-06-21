@@ -97,6 +97,29 @@ def home():
     return "Quick Study Builder Backend Running"
 
 
+def _ai_quota_payload(gemini_status):
+    from modules.gemini_usage import get_usage
+
+    usage = get_usage()
+    status = str(gemini_status or "")
+    google_exhausted = status == "error_429" or "429" in status
+    internal_exhausted = bool(usage.get("quotaExceeded"))
+    exhausted = google_exhausted or internal_exhausted
+    return {
+        "available": not exhausted and status == "ok",
+        "exhausted": exhausted,
+        "resetsAt": usage.get("resetsAt"),
+        "used": usage.get("used"),
+        "limit": usage.get("limit"),
+        "message": (
+            "Daily AI limit reached. Please try again tomorrow — "
+            "AI tools will work automatically after the quota resets."
+            if exhausted
+            else None
+        ),
+    }
+
+
 @app.route("/api/health", methods=["GET"])
 def health():
     from modules.gemini_config import gemini_api_keys
@@ -121,6 +144,7 @@ def health():
     return {
         "ok": True,
         "geminiKey": gemini_status,
+        "aiQuota": _ai_quota_payload(gemini_status),
         "database": database_info(),
         "modules": [
             "grammar /grammar/check",

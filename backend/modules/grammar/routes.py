@@ -105,6 +105,8 @@ def check_grammar():
             }
         )
     except RuntimeError as exc:
-        return jsonify({"error": str(exc)}), 503
+        msg = str(exc)
+        code = "quota_exceeded" if "quota" in msg.lower() or "429" in msg else "service_unavailable"
+        return jsonify({"error": msg, "code": code}), 503
     except Exception as exc:
         return jsonify({"error": str(exc)}), 500

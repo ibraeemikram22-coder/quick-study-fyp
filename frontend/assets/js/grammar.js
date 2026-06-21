@@ -38,9 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok || data.error) {
-            const msg =
-                data.error ||
-                (typeof toUserMessage === "function" ? toUserMessage("backend") : "Grammar check failed.");
+            const msg = typeof handleAiModuleError === "function"
+                ? handleAiModuleError(new Error(data.error || "Grammar check failed."), data)
+                : (typeof toUserMessage === "function" ? toUserMessage(data.error || "Grammar check failed.") : (data.error || "Grammar check failed."));
             output.innerText = msg;
             percent.innerText = "Errors: —";
             explanationBox.innerHTML = "";

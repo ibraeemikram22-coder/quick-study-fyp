@@ -297,19 +297,57 @@ function showBackendOfflineBanner() {
   document.body.style.paddingTop = "52px";
 }
 
+function loadScriptOnce(src) {
+  const name = src.split("/").pop();
+  if ([...document.scripts].some((s) => s.src && s.src.includes(name))) {
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => {
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload = () => resolve();
+    s.onerror = () => resolve();
+    document.head.appendChild(s);
+  });
+}
+
+function loadGeminiNoticeScript() {
+  if (typeof handleHealthAiQuota === "function") return Promise.resolve();
+  const base = getBasePath();
+  return (typeof toUserMessage === "function"
+    ? Promise.resolve()
+    : loadScriptOnce(`${base}assets/js/friendly-errors.js`)
+  ).then(() => loadScriptOnce(`${base}assets/js/gemini-notice.js`));
+}
+
 function checkBackendAndWarn() {
   const apiBase = resolveHealthApiBase();
   fetch(`${apiBase}/api/health`, { method: "GET", cache: "no-store" })
-    .then((r) => {
-      if (r.ok) {
-        const el = document.getElementById("backend-offline-banner");
-        if (el) el.remove();
-        if (document.body.style.paddingTop === "52px") document.body.style.paddingTop = "";
+    .then(async (r) => {
+      if (!r.ok) {
+        showBackendOfflineBanner();
         return;
       }
-      showBackendOfflineBanner();
+      const el = document.getElementById("backend-offline-banner");
+      if (el) el.remove();
+      if (document.body.style.paddingTop === "52px") document.body.style.paddingTop = "";
+
+      let data = {};
+      try {
+        data = await r.json();
+      } catch {
+        data = {};
+      }
+      if (typeof handleHealthAiQuota === "function") {
+        handleHealthAiQuota(data);
+      }
     })
     .catch(() => showBackendOfflineBanner());
 }
 
-window.addEventListener("load", () => setTimeout(checkBackendAndWarn, 300));
+window.addEventListener("load", () => {
+  setTimeout(async () => {
+    await loadGeminiNoticeScript();
+    checkBackendAndWarn();
+  }, 300);
+});

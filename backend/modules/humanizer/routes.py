@@ -40,7 +40,11 @@ def humanize():
 
         return jsonify({"id": record_id, "result": result})
 
+    except RuntimeError as e:
+        msg = str(e)
+        code = "quota_exceeded" if "quota" in msg.lower() or "429" in msg else "service_unavailable"
+        return jsonify({"error": msg, "code": code}), 503
     except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 500
+        msg = str(e)
+        code = "quota_exceeded" if "quota" in msg.lower() or "429" in msg else "service_error"
+        return jsonify({"error": msg, "code": code}), 500

@@ -40,8 +40,11 @@ humanizeBtn.addEventListener("click", async () => {
     const data = await res.json();
 
     if (!res.ok || data.error) {
-      setStatus("Error", "error");
-      outputBox.textContent = data.error || "Humanize failed.";
+      const msg = typeof handleAiModuleError === "function"
+        ? handleAiModuleError(new Error(data.error || "Humanize failed."), data)
+        : (typeof toUserMessage === "function" ? toUserMessage(data.error || "Humanize failed.") : (data.error || "Humanize failed."));
+      setStatus(isQuotaExceededMessage(data) ? "Daily limit reached" : "Error", "error");
+      outputBox.textContent = msg;
       return;
     }
 
