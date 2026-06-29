@@ -38,8 +38,9 @@ function switchAdminTab(tab) {
 
 function restoreAdminTab() {
   try {
-    const tab = sessionStorage.getItem(ADMIN_TAB_KEY);
-    if (tab) switchAdminTab(tab);
+    let tab = sessionStorage.getItem(ADMIN_TAB_KEY);
+    if (!tab || !["setup", "chapters"].includes(tab)) tab = "setup";
+    switchAdminTab(tab);
   } catch {
     /* ignore */
   }
@@ -47,6 +48,26 @@ function restoreAdminTab() {
 
 function listRow(label, onRemove) {
   return `<li class="admin-list-row"><span>${label}</span><button type="button" class="btn btn-sm btn-outline-danger admin-remove-btn" data-action="${onRemove}">Remove</button></li>`;
+}
+
+function renderSetupSummary() {
+  const el = document.getElementById("setupSummary");
+  if (!el) return;
+  const classes = cache.classes || [];
+  const exams = cache.examTypes || [];
+  const subjects = cache.subjects || [];
+  const books = cache.books || [];
+  if (!cache.boards.length && !classes.length) {
+    el.innerHTML =
+      "<p class='mb-0'>Not loaded yet. Click <strong>Load Punjab Board setup</strong> above.</p>";
+    return;
+  }
+  el.innerHTML = `
+    <p class="mb-2"><strong>Board:</strong> ${cache.boards.map((b) => b.name).join(", ") || "—"}</p>
+    <p class="mb-2"><strong>Classes:</strong> ${classes.map((c) => c.name).join(", ") || "—"}</p>
+    <p class="mb-2"><strong>Subjects:</strong> ${subjects.map((s) => s.name).join(", ") || "—"}</p>
+    <p class="mb-2"><strong>Exam types:</strong> ${exams.map((e) => e.name).join(", ") || "—"}</p>
+    <p class="mb-0"><strong>Books registered:</strong> ${books.length} — upload PDFs in the <strong>Books</strong> tab.</p>`;
 }
 
 async function removeItem(url, label) {
@@ -85,18 +106,7 @@ function wrapClearableInput(el) {
 }
 
 function initSetupClearButtons() {
-  [
-    "className",
-    "examName",
-    "examCode",
-    "subjectName",
-    "bookName",
-    "chapterTitle",
-    "patMcq",
-    "patShort",
-    "patLong",
-    "importJsonText",
-  ].forEach((id) => wrapClearableInput(document.getElementById(id)));
+  ["chapterTitle"].forEach((id) => wrapClearableInput(document.getElementById(id)));
   wrapClearableInput(document.getElementById("chapterContent"));
 }
 
@@ -706,57 +716,13 @@ async function loadAll() {
   cache.books = books;
   cache.classes = classes;
 
-  fillSelect("classBoardId", cache.boards, "id", (b) => b.name);
-  fillSelect("patternBoardId", cache.boards, "id", (b) => b.name);
-  fillSelect("patternExamId", cache.examTypes, "id", (e) => e.name);
-  fillSelect("bookSubjectId", cache.subjects, "id", (s) => s.name);
   fillSelect("chapterBookId", cache.books, "id", (b) => `${b.name} (${b.subjectName})`);
   fillUploadSubjects();
 
-  document.getElementById("boardList").innerHTML = cache.boards
-    .map((b) => `<li>${b.name} <code>${b.code}</code></li>`)
-    .join("");
-  document.getElementById("classList").innerHTML = (classes || [])
-    .map((c) =>
-      listRow(`${c.name}${c.boardName ? " — " + c.boardName : ""}`, `class:${c.id}`)
-    )
-    .join("");
-  document.getElementById("examList").innerHTML = (cache.examTypes || [])
-    .map((e) => listRow(`${e.name} <code>${e.code}</code>`, `exam:${e.id}`))
-    .join("");
-  document.getElementById("subjectList").innerHTML = cache.subjects
-    .map((s) => listRow(s.name, `subject:${s.id}`))
-    .join("");
-  document.getElementById("bookList").innerHTML = books
-    .map((b) => listRow(`${b.name} — ${b.subjectName}`, `book:${b.id}`))
-    .join("");
-  document.getElementById("patternList").innerHTML = (cache.patterns || [])
-    .map((p) =>
-      listRow(
-        `${p.boardCode}/${p.examCode}: MCQ ${p.mcqCount}, Short ${p.shortCount}, Long ${p.longCount}`,
-        `pattern:${p.id}`
-      )
-    )
-    .join("");
-
-  document.querySelectorAll(".admin-remove-btn").forEach((btn) => {
-    btn.onclick = () => {
-      const [kind, id] = (btn.dataset.action || "").split(":");
-      const paths = {
-        class: `/api/questionbank/admin/classes/${id}`,
-        exam: `/api/questionbank/admin/exam-types/${id}`,
-        subject: `/api/questionbank/admin/subjects/${id}`,
-        book: `/api/questionbank/admin/books/${id}`,
-        pattern: `/api/questionbank/admin/patterns/${id}`,
-      };
-      if (paths[kind]) removeItem(paths[kind], kind);
-    };
-  });
+  renderSetupSummary();
 
   await loadChapters();
   checkSetupState();
-  await checkGeminiStatus();
-  await renderApiUsage();
   setStatus(
     `Ready — ${cache.boards.length} boards, ${(cache.classes || []).length} classes, ${cache.books.length} books.`
   );
@@ -870,13 +836,6 @@ function renderChapterList() {
 async function loadChapters() {
   const chapters = await apiFetch("/api/questionbank/admin/chapters");
   cache.chapters = chapters;
-  const bookName = (c) => {
-    const b = cache.books.find((x) => x.id === c.bookId);
-    return b ? `${b.name}: ${c.title}` : c.title;
-  };
-  fillSelect("genChapterId", chapters, "id", (c) => `${bookName(c)} (${c.questionCount} Q)`);
-  fillSelect("viewChapterId", chapters, "id", bookName);
-  fillSelect("importChapterId", chapters, "id", bookName);
   renderChapterList();
   renderBookUploadGrid();
 }
@@ -885,123 +844,13 @@ document.querySelectorAll("#adminTabs .nav-link").forEach((btn) => {
   btn.onclick = () => switchAdminTab(btn.dataset.tab);
 });
 
-const addBoardBtn = document.getElementById("addBoardBtn");
-if (addBoardBtn) {
-  addBoardBtn.onclick = async () => {
-    try {
-      const data = await apiFetch("/api/questionbank/admin/boards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: document.getElementById("boardName").value,
-          code: document.getElementById("boardCode").value,
-        }),
-      });
-      showJson(data);
-      await loadAll();
-    } catch (e) {
-      setStatus(e.message, true);
-    }
-  };
-}
-
-document.getElementById("addClassBtn").onclick = async () => {
-  try {
-    const data = await apiFetch("/api/questionbank/admin/classes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: document.getElementById("className").value,
-        boardId: parseInt(document.getElementById("classBoardId").value, 10) || null,
-      }),
-    });
-    showJson(data);
-    document.getElementById("className").value = "";
-    await loadAll();
-  } catch (e) {
-    setStatus(e.message, true);
-  }
-};
-
-document.getElementById("addExamBtn").onclick = async () => {
-  try {
-    const data = await apiFetch("/api/questionbank/admin/exam-types", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: document.getElementById("examName").value,
-        code: document.getElementById("examCode").value,
-      }),
-    });
-    showJson(data);
-    document.getElementById("examName").value = "";
-    document.getElementById("examCode").value = "";
-    await loadAll();
-  } catch (e) {
-    setStatus(e.message, true);
-  }
-};
-
-document.getElementById("addSubjectBtn").onclick = async () => {
-  try {
-    const data = await apiFetch("/api/questionbank/admin/subjects", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: document.getElementById("subjectName").value }),
-    });
-    showJson(data);
-    document.getElementById("subjectName").value = "";
-    await loadAll();
-  } catch (e) {
-    setStatus(e.message, true);
-  }
-};
-
-document.getElementById("addBookBtn").onclick = async () => {
-  try {
-    const data = await apiFetch("/api/questionbank/admin/books", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: document.getElementById("bookName").value,
-        subjectId: parseInt(document.getElementById("bookSubjectId").value, 10),
-      }),
-    });
-    showJson(data);
-    document.getElementById("bookName").value = "";
-    await loadAll();
-  } catch (e) {
-    setStatus(e.message, true);
-  }
-};
-
-document.getElementById("addPatternBtn").onclick = async () => {
-  try {
-    const data = await apiFetch("/api/questionbank/admin/patterns", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        boardId: parseInt(document.getElementById("patternBoardId").value, 10),
-        examTypeId: parseInt(document.getElementById("patternExamId").value, 10),
-        mcqCount: parseInt(document.getElementById("patMcq").value, 10),
-        shortCount: parseInt(document.getElementById("patShort").value, 10),
-        longCount: parseInt(document.getElementById("patLong").value, 10),
-      }),
-    });
-    showJson(data);
-    await loadAll();
-  } catch (e) {
-    setStatus(e.message, true);
-  }
-};
-
-document.getElementById("cancelChapterBtn").onclick = () => {
+document.getElementById("cancelChapterBtn")?.addEventListener("click", () => {
   document.getElementById("chapterTitle").value = "";
   document.getElementById("chapterContent").value = "";
   setStatus("Form cleared.");
-};
+});
 
-document.getElementById("saveChapterBtn").onclick = async () => {
+document.getElementById("saveChapterBtn")?.addEventListener("click", async () => {
   try {
     setStatus("Saving chapter...");
     const data = await apiFetch("/api/questionbank/admin/chapters", {
@@ -1016,66 +865,17 @@ document.getElementById("saveChapterBtn").onclick = async () => {
     showJson(data);
     document.getElementById("chapterContent").value = "";
     await loadChapters();
-    setStatus("Chapter saved in database.");
+    setStatus("Chapter saved.");
   } catch (e) {
     setStatus(e.message, true);
   }
-};
+});
 
-document.getElementById("generateQuestionsBtn").onclick = async () => {
-  const chapterId = document.getElementById("genChapterId").value;
-  if (!chapterId) {
-    setStatus("Select a chapter first.", true);
-    return;
-  }
-  try {
-    setStatus("Generating questions (may take 30–60 sec)...");
-    const data = await apiFetch(
-      `/api/questionbank/admin/chapters/${chapterId}/generate`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mcqCount: parseInt(document.getElementById("genMcq").value, 10),
-          shortCount: parseInt(document.getElementById("genShort").value, 10),
-          longCount: parseInt(document.getElementById("genLong").value, 10),
-          useN8n: document.getElementById("useN8n").checked,
-        }),
-      }
-    );
-    showJson(data);
-    await loadChapters();
-    setStatus(
-      data.mode === "n8n"
-        ? "Sent to n8n. Questions will appear when webhook returns."
-        : `Saved ${data.generated} questions to database.`
-    );
-  } catch (e) {
-    setStatus(e.message, true);
-  }
-};
-
-async function loadQuestions() {
-  const chapterId = document.getElementById("viewChapterId").value;
-  if (!chapterId) return;
-  const rows = await apiFetch(`/api/questionbank/questions?chapterId=${chapterId}`);
-  showJson(rows);
-  document.getElementById("questionsTable").innerHTML = rows
-    .map(
-      (q, i) =>
-        `<div class="border-bottom py-2"><strong>${i + 1}. [${q.questionType}]</strong> ${q.questionText}<br><span class="text-muted">Ans: ${q.correctAnswer}</span></div>`
-    )
-    .join("") || "<p>No questions yet.</p>";
-}
-
-document.getElementById("refreshQuestionsBtn").onclick = () =>
-  loadQuestions().catch((e) => setStatus(e.message, true));
-
-document.getElementById("punjabSetupBtn").onclick = async () => {
+document.getElementById("punjabSetupBtn")?.addEventListener("click", async () => {
   const btn = document.getElementById("punjabSetupBtn");
   try {
     btn.disabled = true;
-    setStatus("Loading Punjab Board (English, Physics, Chemistry, Biology, Computer)...");
+    setStatus("Loading Punjab Board setup (Physics, Chemistry, Biology, Computer)...");
     const res = await fetch(`${API_BASE}/api/questionbank/setup-punjab`, { method: "POST" });
     const json = await res.json().catch(() => ({}));
     if (!res.ok || json.success === false) {
@@ -1094,40 +894,7 @@ document.getElementById("punjabSetupBtn").onclick = async () => {
   } finally {
     btn.disabled = false;
   }
-};
-
-document.getElementById("importJsonBtn").onclick = async () => {
-  const chapterId = document.getElementById("importChapterId").value;
-  if (!chapterId) {
-    setStatus("Select chapter for import.", true);
-    return;
-  }
-  let payload;
-  try {
-    payload = JSON.parse(document.getElementById("importJsonText").value.trim());
-  } catch {
-    setStatus("Invalid JSON. Use { \"questions\": [ ... ] }", true);
-    return;
-  }
-  const questions = payload.questions || payload;
-  if (!Array.isArray(questions) || !questions.length) {
-    setStatus("JSON must contain a questions array.", true);
-    return;
-  }
-  try {
-    setStatus("Importing...");
-    const data = await apiFetch("/api/questionbank/admin/import-questions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chapterId: parseInt(chapterId, 10), questions }),
-    });
-    showJson(data);
-    await loadChapters();
-    setStatus(`Imported ${data.imported} questions.`);
-  } catch (e) {
-    setStatus(e.message, true);
-  }
-};
+});
 
 initSetupClearButtons();
 initUnifiedBookUpload();
