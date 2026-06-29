@@ -322,8 +322,12 @@ function loadGeminiNoticeScript() {
 
 function checkBackendAndWarn() {
   const apiBase = resolveHealthApiBase();
-  fetch(`${apiBase}/api/health`, { method: "GET", cache: "no-store" })
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+
+  fetch(`${apiBase}/api/ping`, { method: "GET", cache: "no-store", signal: controller.signal })
     .then(async (r) => {
+      clearTimeout(timer);
       if (!r.ok) {
         showBackendOfflineBanner();
         return;
@@ -332,17 +336,25 @@ function checkBackendAndWarn() {
       if (el) el.remove();
       if (document.body.style.paddingTop === "52px") document.body.style.paddingTop = "";
 
-      let data = {};
       try {
-        data = await r.json();
+        const healthRes = await fetch(`${apiBase}/api/health?quick=1`, {
+          method: "GET",
+          cache: "no-store",
+        });
+        if (healthRes.ok) {
+          const data = await healthRes.json().catch(() => ({}));
+          if (typeof handleHealthAiQuota === "function") {
+            handleHealthAiQuota(data);
+          }
+        }
       } catch {
-        data = {};
-      }
-      if (typeof handleHealthAiQuota === "function") {
-        handleHealthAiQuota(data);
+        /* quota banner optional if health slow */
       }
     })
-    .catch(() => showBackendOfflineBanner());
+    .catch(() => {
+      clearTimeout(timer);
+      showBackendOfflineBanner();
+    });
 }
 
 window.addEventListener("load", () => {

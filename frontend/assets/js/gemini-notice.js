@@ -172,7 +172,7 @@ async function fetchAiQuotaStatus() {
         ? resolveHealthApiBase()
         : window.location.origin;
   try {
-    const res = await fetch(`${base}/api/health`, { method: "GET", cache: "no-store" });
+    const res = await fetch(`${base}/api/health?quick=1`, { method: "GET", cache: "no-store" });
     if (!res.ok) return { exhausted: false };
     const data = await res.json();
     return handleHealthAiQuota(data);

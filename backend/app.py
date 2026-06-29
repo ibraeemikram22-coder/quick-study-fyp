@@ -120,26 +120,56 @@ def _ai_quota_payload(gemini_status):
     }
 
 
+@app.route("/api/ping", methods=["GET"])
+def ping():
+    """Fast liveness check — no external API calls (used by frontend banner)."""
+    return {"ok": True}
+
+
+_GEMINI_HEALTH_CACHE = {"ts": 0.0, "status": "unknown"}
+
+
+def _gemini_health_status(keys, cache_seconds=600):
+    """Check Gemini key status; cache result to keep /api/health fast."""
+    import time
+
+    if not keys:
+        return "missing"
+
+    now = time.time()
+    cached = _GEMINI_HEALTH_CACHE
+    if cached["status"] != "unknown" and now - cached["ts"] < cache_seconds:
+        return cached["status"]
+
+    try:
+        from modules.gemini_config import gemini_model_chain, gemini_post, gemini_url
+
+        model = gemini_model_chain()[0]
+        res = gemini_post(
+            gemini_url(model),
+            keys[0],
+            {"contents": [{"parts": [{"text": "ok"}]}]},
+            timeout=5,
+        )
+        status = "ok" if res.ok else f"error_{res.status_code}"
+    except Exception as exc:
+        status = f"error: {exc}"
+
+    _GEMINI_HEALTH_CACHE.update(ts=now, status=status)
+    return status
+
+
 @app.route("/api/health", methods=["GET"])
 def health():
+    from flask import request
+
     from modules.gemini_config import gemini_api_keys
 
     keys = gemini_api_keys()
-    gemini_status = "missing"
-    if keys:
-        try:
-            from modules.gemini_config import gemini_model_chain, gemini_post, gemini_url
-
-            model = gemini_model_chain()[0]
-            res = gemini_post(
-                gemini_url(model),
-                keys[0],
-                {"contents": [{"parts": [{"text": "ok"}]}]},
-                timeout=15,
-            )
-            gemini_status = "ok" if res.ok else f"error_{res.status_code}"
-        except Exception as exc:
-            gemini_status = f"error: {exc}"
+    if request.args.get("quick") == "1":
+        gemini_status = _GEMINI_HEALTH_CACHE.get("status") or ("configured" if keys else "missing")
+    else:
+        gemini_status = _gemini_health_status(keys)
 
     return {
         "ok": True,
