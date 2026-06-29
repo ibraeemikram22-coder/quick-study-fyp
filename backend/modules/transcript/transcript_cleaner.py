@@ -7,8 +7,11 @@ import requests
 from modules.gemini_config import (
     RETRYABLE_STATUSES,
     SKIP_MODEL_STATUSES,
+    format_gemini_failure,
     gemini_model_chain,
+    gemini_post,
     gemini_url,
+    is_quota_exceeded,
 )
 
 BRACKET_TAG = re.compile(r"\[[^\]]{1,120}\]", re.UNICODE)
@@ -16,17 +19,18 @@ PAREN_SOUND = re.compile(
     r"\((?:music|singing|applause|laughter|instrumental)[^)]*\)",
     re.IGNORECASE | re.UNICODE,
 )
-NON_ROMAN_SCRIPT = re.compile(r"[\u0600-\u06FF\u0900-\u097F\u0980-\u09FF]")
+NON_ROMAN_SCRIPT = re.compile(r"[\u0600-\u06FF\u0900-\u097F\u0980-\u09FF\u0A00-\u0A7F]")
 
 ROMAN_TRANSCRIPT_RULES = """
-STRICT RULES:
-1. ROMAN SCRIPT ONLY — use Latin letters (A-Z). Example: "tujhe dekh suna" NOT "तुझे देख" and NOT Urdu script.
-2. VERBATIM — write exactly what is spoken/sung, in order. One phrase per line. Do not skip lines.
-3. If the speaker uses Urdu or Hindi, write Roman Urdu/Hindi (transliteration). Do NOT translate into English words.
-4. If the speaker uses English, write normal English.
-5. Remove ONLY non-speech labels like [Music], [Singing], [संगीत], (applause), ♪ — never remove real lyrics.
-6. Do not summarize, do not paraphrase, do not merge different lines.
-7. If a chorus repeats in the audio, you may repeat that line when it is sung again.
+STRICT RULES — ROMAN SCRIPT OUTPUT:
+1. Use ONLY Latin letters (A-Z, a-z). Never use Devanagari (हिंदी), Urdu/Arabic script, or Gurmukhi.
+2. VERBATIM — write exactly what is spoken or sung, in order. One phrase per line.
+3. Hindi speech/lyrics → Roman Hindi (e.g. "be sir pair ki baatein kar raha hoon", NOT "बे सर पैर की").
+4. Urdu speech/lyrics → Roman Urdu (e.g. "ghar ho kar bhi beghar phir raha hoon").
+5. English speech → normal English spelling.
+6. Do NOT translate Hindi/Urdu into English words — only transliterate to Roman.
+7. Remove ONLY non-speech tags like [Music], (applause), ♪ — never remove real lyrics.
+8. Do not summarize or skip lines.
 """
 
 
@@ -87,40 +91,63 @@ def _call_gemini_text(prompt: str, api_key: str) -> str:
                 last_err = "Empty Gemini response"
                 continue
 
+            if is_quota_exceeded(res.status_code, res.text):
+                raise RuntimeError(format_gemini_failure(res.status_code, res.text))
+
             if res.status_code in SKIP_MODEL_STATUSES:
                 last_err = res.text[:200]
                 break
             if res.status_code not in RETRYABLE_STATUSES:
-                raise RuntimeError(f"Gemini error ({res.status_code}): {res.text[:200]}")
+                raise RuntimeError(format_gemini_failure(res.status_code, res.text))
             last_err = res.text[:200]
 
     raise RuntimeError(last_err)
 
 
-def polish_roman_verbatim(text: str) -> str:
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        return strip_noise(text)
-
-    snippet = strip_noise(text)[:14000]
-    prompt = f"""Convert this video transcript for a student.
+def _polish_chunk(snippet: str, api_key: str) -> str:
+    prompt = f"""Convert this video transcript for a student learning tool.
 
 {ROMAN_TRANSCRIPT_RULES}
 
-Raw transcript:
+Raw transcript (may be Hindi/Urdu script or mixed):
 {snippet}
 
-Return ONLY the Roman-script verbatim lines, nothing else."""
+Return ONLY Roman-script verbatim lines. No headings, no explanation."""
 
-    try:
-        return strip_noise(_call_gemini_text(prompt, api_key)) or strip_noise(text)
-    except Exception:
+    return strip_noise(_call_gemini_text(prompt, api_key))
+
+
+def polish_roman_verbatim(text: str) -> str:
+    api_key = (os.getenv("GEMINI_API_KEY") or "").strip()
+    if not api_key:
         return strip_noise(text)
+
+    cleaned = strip_noise(text)
+    chunk_size = 12000
+    if len(cleaned) <= chunk_size:
+        out = _polish_chunk(cleaned[:14000], api_key) or cleaned
+    else:
+        parts = []
+        for start in range(0, len(cleaned), chunk_size):
+            piece = cleaned[start : start + chunk_size]
+            parts.append(_polish_chunk(piece, api_key) or piece)
+            if start + chunk_size < len(cleaned):
+                time.sleep(0.5)
+        out = "\n".join(p for p in parts if p)
+
+    if needs_roman_polish(out):
+        raise RuntimeError(
+            "Could not convert transcript to Roman script. "
+            "Daily AI limit may be reached — please try again tomorrow."
+        )
+    return out or cleaned
 
 
 def finalize_transcript(text: str) -> str:
-    """Remove noise tags; output Roman Urdu/English lines, verbatim."""
+    """Remove noise tags; output Roman Urdu/Hindi/English lines, verbatim."""
     stripped = strip_noise(text)
-    if os.getenv("GEMINI_API_KEY"):
-        return polish_roman_verbatim(stripped)
-    return stripped
+    if not needs_roman_polish(stripped):
+        return stripped
+    if not (os.getenv("GEMINI_API_KEY") or "").strip():
+        return stripped
+    return polish_roman_verbatim(stripped)
